@@ -1,0 +1,15 @@
+{
+    "testdata_path": "input/qa.jsonl",
+    "results_dir": "results/experiment<TIMESTAMP>",
+    "target_url": "http://host.docker.internal:50505/chat",
+    "target_parameters": {
+        "overrides": {
+            "semantic_ranker": false,
+            "retrieval_mode": "hybrid",
+            "semantic_captions": false,
+            "top": 3,
+            "suggest_followup_questions": false,
+            "prompt_template": "<READFILE>input/prompt_chris.txt"
+        }
+    }
+}
