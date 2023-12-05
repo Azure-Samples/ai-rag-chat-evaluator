@@ -148,3 +148,5 @@ static/
 
 # From azure-ai-generative
 mlruns/
+
+.DS_Store
