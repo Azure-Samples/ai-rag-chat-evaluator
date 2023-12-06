@@ -5,11 +5,7 @@
     "target_parameters": {
         "overrides": {
             "semantic_ranker": false,
-            "retrieval_mode": "hybrid",
-            "semantic_captions": false,
-            "top": 3,
-            "suggest_followup_questions": false,
-            "prompt_template": "<READFILE>example_input/prompt_chris.txt"
+            "prompt_template": "<READFILE>example_input/prompt_refined.txt"
         }
     }
 }

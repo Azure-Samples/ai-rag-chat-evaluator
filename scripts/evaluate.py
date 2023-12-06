@@ -9,6 +9,8 @@ from azure.ai.generative.evaluate import evaluate
 
 from . import service_setup
 
+logger = logging.getLogger("scripts")
+
 
 def send_question_to_target(question: str, target_url: str, parameters: dict = {}):
     http = urllib3.PoolManager()
@@ -21,11 +23,12 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
     r = http.request("POST", target_url, headers=headers, body=json.dumps(body))
     try:
         response_dict = json.loads(r.data.decode("utf-8"))
-        return {
+        response_obj = {
             "question": question,
             "answer": response_dict["choices"][0]["message"]["content"],
             "context": "\n\n".join(response_dict["choices"][0]["context"]["data_points"]),
         }
+        return response_obj
     except Exception as e:
         logging.error(e)
         return {
@@ -48,17 +51,17 @@ def run_evaluation(
     target_parameters={},
     num_questions=None,
 ):
-    logging.info("Running evaluation using data from %s", testdata_path)
+    logger.info("Running evaluation using data from %s", testdata_path)
     testdata = load_jsonl(testdata_path)
     if num_questions:
-        logging.info("Limiting evaluation to %s questions", num_questions)
+        logger.info("Limiting evaluation to %s questions", num_questions)
         testdata = testdata[:num_questions]
 
     # Wrap the target function so that it can be called with a single argument
     async def wrap_target(question: str):
         return send_question_to_target(question, target_url, target_parameters)
 
-    gpt_metrics = ["gpt_groundedness", "gpt_relevance", "gpt_coherence", "gpt_similarity"]
+    gpt_metrics = ["gpt_coherence", "gpt_relevance", "gpt_groundedness"]
     results = evaluate(
         evaluation_name="baseline-evaluation",
         target=wrap_target,
@@ -78,7 +81,7 @@ def run_evaluation(
         output_path=results_dir,
     )
 
-    logging.info("Evaluation calls have completed. Calculating overall metrics now...")
+    logger.info("Evaluation calls have completed. Calculating overall metrics now...")
     eval_results_filename = list(results.artifacts.keys())[0]
     with open(results_dir / eval_results_filename) as f:
         questions_with_ratings = [json.loads(question_json) for question_json in f.readlines()]
@@ -133,7 +136,7 @@ def run_evaluation(
             "num_questions": num_questions,
         }
         parameters_file.write(json.dumps(parameters, indent=4))
-    logging.info("Evaluation results saved in %s", results_dir)
+    logger.info("Evaluation results saved in %s", results_dir)
 
 
 def process_config(obj: dict):
@@ -146,17 +149,17 @@ def process_config(obj: dict):
             if isinstance(obj[key], dict):
                 process_config(obj[key])
             elif isinstance(obj[key], str) and "<TIMESTAMP>" in obj[key]:
-                logging.info("Replaced %s in config with timestamp", key)
+                logger.info("Replaced %s in config with timestamp", key)
                 obj[key] = obj[key].replace("<TIMESTAMP>", str(int(time.time())))
             elif isinstance(obj[key], str) and "<READFILE>" in obj[key]:
                 with open(obj[key].replace("<READFILE>", "")) as f:
-                    logging.info("Replaced %s in config with contents of %s", key, f.name)
+                    logger.info("Replaced %s in config with contents of %s", key, f.name)
                     obj[key] = f.read()
 
 
 def run_evaluate_from_config(working_dir, config_path, num_questions):
     config_path = working_dir / Path(config_path)
-    logging.info("Running evaluation from config %s", config_path)
+    logger.info("Running evaluation from config %s", config_path)
     with open(config_path) as f:
         config = json.load(f)
         process_config(config)
@@ -168,12 +171,12 @@ def run_evaluate_from_config(working_dir, config_path, num_questions):
         testdata_path=working_dir / config["testdata_path"],
         results_dir=results_dir,
         target_url=config["target_url"],
-        target_parameters=config["target_parameters"],
+        target_parameters=config.get("target_parameters", {}),
         num_questions=num_questions,
     )
 
     results_config_path = results_dir / "config.json"
-    logging.info("Saving original config file back to to %s", results_config_path)
+    logger.info("Saving original config file back to to %s", results_config_path)
     with open(config_path) as input_config:
         with open(results_config_path, "w") as output_config:
             output_config.write(input_config.read())

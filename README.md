@@ -68,7 +68,7 @@ There are a few ways to get this data:
 We provide a script that loads in the current `azd` environment's variables, installs the requirements for the evaluation, and runs the evaluation against the local app. Run it like this:
 
 ```shell
-python3 -m scripts evaluate --config=example_config.json --numquestions=2
+python3 -m scripts evaluate --config=example_config.json
 ```
 
 The config.json should contain these fields as a minimum:
@@ -112,17 +112,13 @@ This repo assumes that your chat app is following the [Chat App Protocol](TODO),
 }
 ```
 
-Any additional app parameters would be specified in the `context` of that JSON, such as temperature, search settings, prompt overrides, etc. To specify those parameters, add a `target_parameters` key to your config JSON:
+Any additional app parameters would be specified in the `context` of that JSON, such as temperature, search settings, prompt overrides, etc. To specify those parameters, add a `target_parameters` key to your config JSON. For example:
 
 ```json
     "target_parameters": {
         "overrides": {
             "semantic_ranker": false,
-            "retrieval_mode": "hybrid",
-            "semantic_captions": false,
-            "top": 3,
-            "suggest_followup_questions": false,
-            "prompt_template": "<READFILE>example_input/prompt_chris.txt"
+            "prompt_template": "<READFILE>example_input/prompt_refined.txt"
         }
     }
 ```

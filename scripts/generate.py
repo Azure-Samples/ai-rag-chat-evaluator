@@ -5,6 +5,8 @@ from pathlib import Path
 from azure.ai.generative.synthetic.qa import QADataGenerator, QAType
 from azure.search.documents import SearchClient
 
+logger = logging.getLogger("scripts")
+
 
 def generate_test_qa_data(
     openai_config: dict,
@@ -13,7 +15,7 @@ def generate_test_qa_data(
     num_questions_per_source: int,
     output_file: Path,
 ):
-    logging.info(
+    logger.info(
         "Generating %d questions total, %d per source, based on search results",
         num_questions_total,
         num_questions_per_source,
@@ -28,7 +30,7 @@ def generate_test_qa_data(
     for doc in r:
         if len(qa) > num_questions_total:
             break
-        logging.info("Processing search document %s", doc["sourcepage"])
+        logger.info("Processing search document %s", doc["sourcepage"])
         text = doc["content"]
 
         result = qa_generator.generate(
@@ -41,7 +43,7 @@ def generate_test_qa_data(
             citation = f"[{doc['sourcepage']}]"
             qa.append({"question": question, "answer": answer + citation})
 
-    logging.info("Writing %d questions to %s", len(qa), output_file)
+    logger.info("Writing %d questions to %s", len(qa), output_file)
     with open(output_file, "w") as f:
         for item in qa:
             f.write(json.dumps(item) + "\n")
