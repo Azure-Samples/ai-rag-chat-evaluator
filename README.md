@@ -10,6 +10,25 @@ that we've run on our [sample chat app](https://github.com/Azure-Samples/azure-s
 
 [ 📺 Watch a video overview of this repo](https://www.youtube.com/watch?v=mM8pZAI2C5w)
 
+Table of contents:
+
+* [Setting up this project](#setting-up-this-project)
+* [Deploying a GPT-4 model](#deploying-a-gpt-4-model)
+* [Generating ground truth data](#generating-ground-truth-data)
+* [Running an evaluation](#running-an-evaluation)
+
+## Setting up this project
+
+If you open this project in a Dev Container or GitHub Codespaces, it will automatically set up the environment for you.
+If not, then follow these steps:
+
+1. Install Python 3.10 or higher
+2. Install the requirements:
+
+    ```shell
+    python3 -m pip install -r requirements.txt
+    ```
+
 ## Deploying a GPT-4 model
 
 It's best to use a GPT-4 model for performing the evaluation, even if your chat app uses GPT-3.5 or another model.
@@ -50,7 +69,7 @@ If you have an openai.com instance, you can use that instead of an Azure OpenAI 
     ```
 
 
-## Setting up ground truth data
+## Generating ground truth data
 
 In order to evaluate new answers, they must be compared to "ground truth" answers: the ideal answer for a particular question.
 We recommend at least 200 QA pairs if possible.
@@ -67,6 +86,14 @@ There are a few ways to get this data:
     That script will generate 200 questions and answers, and store them in `evaluator/qa.jsonl`. We've already provided an example based off the sample documents for this app.
 
 3. Use the generator script to generate a set of questions and answers, and then manually curate them, rewriting any answers that are subpar and adding missing citations. This is a good middle ground, and is what we recommend.
+
+<details>
+ <summary>Additional tips for ground truth data generation</summary>
+
+* Generate more QA pairs than you need, then prune them down manually based on quality and overlap. Remove low quality answers, and remove questions that are too similar to other questions.
+* Be aware of the knowledge distribution in the document set, so you effectively sample questions across the knowledge space.
+* Once your chat application is live, continually sample live user questions (within accordance to your privacy policy) to make sure you're representing the sorts of questions that users are asking.
+</details>
 
 ## Running an evaluation
 

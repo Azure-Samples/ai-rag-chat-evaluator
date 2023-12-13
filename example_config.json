@@ -1,7 +1,7 @@
 {
     "testdata_path": "example_input/qa.jsonl",
     "results_dir": "example_results/experiment<TIMESTAMP>",
-    "target_url": "http://host.docker.internal:50505/chat",
+    "target_url": "http://localhost:50505/chat",
     "target_parameters": {
         "overrides": {
             "semantic_ranker": false,

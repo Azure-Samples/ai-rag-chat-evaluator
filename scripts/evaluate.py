@@ -25,8 +25,10 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
         response_dict = json.loads(r.data.decode("utf-8"))
         response_obj = {
             "question": question,
+            # Adjust this if your RAG chat app does not adhere to the ChatCompletion schema
             "answer": response_dict["choices"][0]["message"]["content"],
-            "context": "\n\n".join(response_dict["choices"][0]["context"]["data_points"]),
+            # Adjust this to match the format of the context returned by the target
+            "context": "\n\n".join(response_dict["choices"][0]["context"]["data_points"]["text"]),
         }
         return response_obj
     except Exception as e:
@@ -57,10 +59,14 @@ def run_evaluation(
         logger.info("Limiting evaluation to %s questions", num_questions)
         testdata = testdata[:num_questions]
 
+    logger.info("Sending a test question to the target to ensure it is running...")
+    send_question_to_target("What information is in your knowledge base?", target_url, target_parameters)
+
     # Wrap the target function so that it can be called with a single argument
     async def wrap_target(question: str):
         return send_question_to_target(question, target_url, target_parameters)
 
+    logger.info("Starting evaluation...")
     gpt_metrics = ["gpt_coherence", "gpt_relevance", "gpt_groundedness"]
     results = evaluate(
         evaluation_name="baseline-evaluation",
