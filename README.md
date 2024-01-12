@@ -71,20 +71,13 @@ If you have an openai.com instance, you can use that instead of an Azure OpenAI 
 
 ## Generating ground truth data
 
-In order to evaluate new answers, they must be compared to "ground truth" answers: the ideal answer for a particular question.
+In order to evaluate new answers, they must be compared to "ground truth" answers: the ideal answer for a particular question. See `example_input/qa.jsonl` for an example of the format.
 We recommend at least 200 QA pairs if possible.
 
 There are a few ways to get this data:
 
 1. Manually curate a set of questions and answers that you consider to be ideal. This is the most accurate, but also the most time-consuming. Make sure your answers include citations in the expected format. This approach requires domain expertise in the data.
-2. Use the generator script to generate a set of questions and answers. This is the fastest, but may also be the least accurate. You can call the script like this:
-
-    ```shell
-    python3 -m scripts generate --output=example_input/qa.jsonl --numquestions=200 --persource=5
-    ```
-
-    That script will generate 200 questions and answers, and store them in `evaluator/qa.jsonl`. We've already provided an example based off the sample documents for this app.
-
+2. Use the generator script to generate a set of questions and answers. This is the fastest, but may also be the least accurate. See below for details on how to run the generator script.
 3. Use the generator script to generate a set of questions and answers, and then manually curate them, rewriting any answers that are subpar and adding missing citations. This is a good middle ground, and is what we recommend.
 
 <details>
@@ -94,6 +87,32 @@ There are a few ways to get this data:
 * Be aware of the knowledge distribution in the document set, so you effectively sample questions across the knowledge space.
 * Once your chat application is live, continually sample live user questions (within accordance to your privacy policy) to make sure you're representing the sorts of questions that users are asking.
 </details>
+
+### Running the generator script
+
+This repo includes a script for generating questions and answers from documents stored in Azure AI Search.
+
+1. Create `.env` file by copying `.env.sample`
+2. Fill in the values for your Azure AI Search instance:
+
+    ```shell
+    AZURE_SEARCH_SERVICE="<service-name>"
+    AZURE_SEARCH_INDEX="<index-name>"
+    AZURE_SEARCH_KEY=""
+    ```
+
+    The key may not be necessary if it's configured for keyless access from your account.
+
+3. Run the generator script:
+
+    ```shell
+    python3 -m scripts generate --output=example_input/qa.jsonl --numquestions=200 --persource=5
+    ```
+
+    That script will generate 200 questions and answers, and store them in `example_input/qa.jsonl`. We've already provided an example based off the sample documents for this app.
+
+    To further customize the generator beyond the `numquestions` and `persource` parameters, modify `scripts/generate.py`.
+
 
 ## Running an evaluation
 
