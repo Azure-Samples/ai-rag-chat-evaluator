@@ -24,7 +24,7 @@
       "value": "S0"
     },
     "openAiApiKey": {
-      "value": "${OPENAI_API_KEY}"
+      "value": "${OPENAI_KEY}"
     },
     "openAiApiOrganization": {
       "value": "${OPENAI_ORGANIZATION}"

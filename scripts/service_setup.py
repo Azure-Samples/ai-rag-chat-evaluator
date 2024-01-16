@@ -7,9 +7,9 @@ from azure.search.documents import SearchClient
 
 def get_openai_config():
     if os.environ.get("OPENAI_HOST") == "azure":
-        if os.environ.get("AZURE_OPENAI_API_KEY"):
+        if os.environ.get("AZURE_OPENAI_KEY"):
             api_type = "azure"
-            api_key = os.environ["AZURE_OPENAI_API_KEY"]
+            api_key = os.environ["AZURE_OPENAI_KEY"]
         else:
             api_type = "azure_ad"
             azure_credential = AzureDeveloperCliCredential()
@@ -25,7 +25,7 @@ def get_openai_config():
     else:
         openai_config = {
             "api_type": "openai",
-            "api_key": os.environ["OPENAI_API_KEY"],
+            "api_key": os.environ["OPENAI_KEY"],
             "organization": os.environ["OPENAI_ORGANIZATION"],
             "model": os.environ["OPENAI_GPT_MODEL"],
         }
@@ -33,7 +33,7 @@ def get_openai_config():
 
 
 def get_search_client():
-    if api_key := os.environ.get("AZURE_SEARCH_API_KEY"):
+    if api_key := os.environ.get("AZURE_SEARCH_KEY"):
         azure_credential = AzureKeyCredential(api_key)
     else:
         azure_credential = AzureDeveloperCliCredential()

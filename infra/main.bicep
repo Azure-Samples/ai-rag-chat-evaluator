@@ -100,5 +100,5 @@ output AZURE_OPENAI_SERVICE string = (openAiHost == 'azure') ? openAi.outputs.na
 output AZURE_OPENAI_RESOURCE_GROUP string = (openAiHost == 'azure') ? openAiResourceGroup.name : ''
 output AZURE_OPENAI_EVAL_DEPLOYMENT string = (openAiHost == 'azure') ? evalGptDeploymentName : ''
 // Used only with non-Azure OpenAI deployments
-output OPENAI_API_KEY string = (openAiHost == 'openai') ? openAiApiKey : ''
+output OPENAI_KEY string = (openAiHost == 'openai') ? openAiApiKey : ''
 output OPENAI_ORGANIZATION string = (openAiHost == 'openai') ? openAiApiOrganization : ''
