@@ -30,7 +30,6 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
             # Adjust this to match the format of the context returned by the target
             "context": "\n\n".join(response_dict["choices"][0]["context"]["data_points"]["text"]),
         }
-        logger.info("Received response from target: %s", response_obj)
         return response_obj
     except Exception as e:
         logger.error(e)
