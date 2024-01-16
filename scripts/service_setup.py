@@ -25,8 +25,8 @@ def get_openai_config():
     else:
         openai_config = {
             "api_type": "openai",
-            "api_key": os.environ["OPENAI_KEY"],
-            "organization": os.environ["OPENAI_ORGANIZATION"],
+            "api_key": os.environ["OPENAICOM_KEY"],
+            "organization": os.environ["OPENAICOM_ORGANIZATION"],
             "model": os.environ["OPENAI_GPT_MODEL"],
         }
     return openai_config
