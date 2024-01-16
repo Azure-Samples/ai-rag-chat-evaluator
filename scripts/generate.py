@@ -41,7 +41,7 @@ def generate_test_qa_data(
 
         for question, answer in result["question_answers"]:
             citation = f"[{doc['sourcepage']}]"
-            qa.append({"question": question, "answer": answer + citation})
+            qa.append({"question": question, "truth": answer + citation})
 
     logger.info("Writing %d questions to %s", len(qa), output_file)
     with open(output_file, "w") as f:
