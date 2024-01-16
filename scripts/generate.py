@@ -44,6 +44,9 @@ def generate_test_qa_data(
             qa.append({"question": question, "truth": answer + citation})
 
     logger.info("Writing %d questions to %s", len(qa), output_file)
+    directory = Path(output_file).parent
+    if not directory.exists():
+        directory.mkdir(parents=True)
     with open(output_file, "w") as f:
         for item in qa:
             f.write(json.dumps(item) + "\n")
