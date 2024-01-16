@@ -32,7 +32,7 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
         }
         return response_obj
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
         return {
             "question": question,
             "answer": "ERROR",

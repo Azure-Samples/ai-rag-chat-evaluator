@@ -64,7 +64,7 @@ If you have an openai.com instance, you can use that instead of an Azure OpenAI 
 2. Fill in the values for your OpenAI account. You might not have an organization, in which case you can leave that blank.
 
     ```shell
-    OPENAICOM_API_KEY=""
+    OPENAICOM_KEY=""
     OPENAICOM_ORGANIZATION=""
     ```
 
