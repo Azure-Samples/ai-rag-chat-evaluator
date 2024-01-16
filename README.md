@@ -102,6 +102,7 @@ This repo includes a script for generating questions and answers from documents 
     ```
 
     The key may not be necessary if it's configured for keyless access from your account.
+    If providing a key, it's best to provide a query key since the script only requires that level of access.
 
 3. Run the generator script:
 
@@ -190,6 +191,16 @@ Inside each run's folder, you'll find:
 
 To make it easier to view and compare results across runs, we've built a few tools,
 located inside the `review-tools` folder.
+
+### Understanding the GPT metrics
+
+By default, the `evaluate` command will compute the metrics of "gpt_coherence", "gpt_relevance", and "gpt_groundedness".
+
+* [coherence](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-coherence) measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language.
+* [relevance](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-relevance) assesses the ability of answers to capture the key points of the context.
+* [groundedness](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-groundedness) assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context.
+
+For more details on those metrics and others, consult the linked documentation.
 
 ### Using the summary tool
 
