@@ -58,9 +58,10 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 
 * Search the repository for an open or closed PR that relates to your submission. You don't want to duplicate effort.
 * Make your changes in a new git fork
-* Install the pre-commit hooks:
+* Install the development tools and pre-commit hooks:
 
    ```shell
+   python3 -m pip install -r requirements-dev.txt
    pre-commit install
    ```
 
