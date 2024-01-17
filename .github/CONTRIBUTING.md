@@ -56,21 +56,16 @@ You can file new issues by providing the above information at the corresponding 
 ### <a name="submit-pr"></a> Submitting a Pull Request (PR)
 Before you submit your Pull Request (PR) consider the following guidelines:
 
-* Search the repository (https://github.com/[organization-name]/[repository-name]/pulls) for an open or closed PR
-  that relates to your submission. You don't want to duplicate effort.
+* Search the repository for an open or closed PR that relates to your submission. You don't want to duplicate effort.
+* Make your changes in a new git fork
+* Install the pre-commit hooks:
 
-* Make your changes in a new git fork:
+   ```shell
+   pre-commit install
+   ```
 
 * Commit your changes using a descriptive commit message
-* Push your fork to GitHub:
-* In GitHub, create a pull request
-* If we suggest changes then:
-  * Make the required updates.
-  * Rebase your fork and force push to your GitHub repository (this will update your Pull Request):
-
-    ```shell
-    git rebase master -i
-    git push -f
-    ```
+* Push your branch to GitHub
+* In GitHub, create a pull request and request a review
 
 That's it! Thank you for your contribution!

@@ -18,5 +18,5 @@
     "hostRequirements": {
         "memory": "8gb"
     },
-    "postCreateCommand": "pip install -r requirements-dev.txt && [ -d .git ] && pre-commit install"
+    "postCreateCommand": "pip install -r requirements-dev.txt"
 }
