@@ -1,6 +1,6 @@
 urllib3
 python-dotenv
-azureml-metrics[generative-ai]>=0.0.33
+azureml-metrics[generative-ai]==0.0.42
 azure-ai-generative==1.0.0b2
 azure-search-documents
 typer
