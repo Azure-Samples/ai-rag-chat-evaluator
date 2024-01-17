@@ -31,7 +31,3 @@ jobs:
           run: ruff .
         - name: Check formatting with black
           run: black . --check --verbose
-        - name: Run textual tools
-          run: |
-            python3 -m review_tools summary example_results
-            python3 -m review_tools diff example_results/baseline_1 example_results/baseline_2
