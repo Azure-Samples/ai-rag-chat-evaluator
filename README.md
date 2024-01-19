@@ -42,6 +42,19 @@ We've made that easy to deploy with the `azd` CLI tool.
 1. Install the [Azure Developer CLI](https://aka.ms/azure-dev/install)
 2. Run `azd auth login` to log in to your Azure account
 3. Run `azd up` to deploy a new GPT-4 instance
+4. Create a `.env` file based on the provisioned resources by running one of the following commands.
+
+    Powershell:
+
+    ```shell
+    azd env get-values > .env
+    ```
+
+    Bash:
+
+    ```powershell
+    $output = azd env get-values; Add-Content -Path .env -Value $output;
+    ```
 
 ### Using an existing Azure OpenAI instance
 

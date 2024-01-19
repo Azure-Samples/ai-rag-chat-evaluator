@@ -7,7 +7,7 @@ param environmentName string
 
 @minLength(1)
 @description('Location for the OpenAI resource')
-@allowed(['canadaeast', 'eastus', 'eastus2', 'francecentral', 'switzerlandnorth', 'uksouth', 'japaneast', 'northcentralus','australiaeast'])
+@allowed(['australiaeast', 'canadaeast', 'francecentral', 'swedencentral', 'switzerlandnorth'])
 @metadata({
   azd: {
     type: 'location'
