@@ -56,7 +56,7 @@ class TableApp(App):
                         summary.get("answer_length", {}).get("mean", "Unknown"),
                     )
                 )
-            with open(Path(results_dir) / folder / "parameters.json") as f:
+            with open(Path(results_dir) / folder / "evaluate_parameters.json") as f:
                 self.row_parameters[folder] = json.load(f)
 
     def compose(self) -> ComposeResult:
