@@ -8,7 +8,7 @@ from . import service_setup
 from .evaluate import run_evaluate_from_config
 from .generate import generate_test_qa_data
 
-app = typer.Typer()
+app = typer.Typer(pretty_exceptions_enable=False)
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s (%(levelname)s) %(name)s: %(message)s", datefmt="%Y-%m-%d %H:%M:%S"

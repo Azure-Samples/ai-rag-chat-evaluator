@@ -31,3 +31,5 @@ jobs:
           run: ruff .
         - name: Check formatting with black
           run: black . --check --verbose
+        - name: Run Pytest tests
+          run: python3 -m pytest

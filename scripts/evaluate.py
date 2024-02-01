@@ -4,7 +4,7 @@ import re
 import time
 from pathlib import Path
 
-import urllib3
+import requests
 from azure.ai.generative.evaluate import evaluate
 
 from . import service_setup
@@ -12,36 +12,46 @@ from . import service_setup
 logger = logging.getLogger("scripts")
 
 
-def send_question_to_target(question: str, target_url: str, parameters: dict = {}):
-    http = urllib3.PoolManager()
+def send_question_to_target(question: str, target_url: str, parameters: dict = {}, raise_error=False):
     headers = {"Content-Type": "application/json"}
     body = {
         "messages": [{"content": question, "role": "user"}],
         "stream": False,
         "context": parameters,
     }
-    r = http.request("POST", target_url, headers=headers, body=json.dumps(body))
     try:
-        response_dict = json.loads(r.data.decode("utf-8"))
-        response_obj = {
-            "question": question,
-            # Adjust this if your RAG chat app does not adhere to the ChatCompletion schema
-            "answer": response_dict["choices"][0]["message"]["content"],
-            # Adjust this to match the format of the context returned by the target
-            "context": "\n\n".join(response_dict["choices"][0]["context"]["data_points"]["text"]),
-        }
+        r = requests.post(target_url, headers=headers, json=body)
+        response_dict = r.json()
+
+        try:
+            answer = response_dict["choices"][0]["message"]["content"]
+            data_points = response_dict["choices"][0]["context"]["data_points"]["text"]
+            context = "\n\n".join(data_points)
+        except Exception:
+            raise ValueError(
+                "Response does not adhere to the expected schema. "
+                "Either adjust the app response or adjust send_question_to_target() in evaluate.py "
+                f"to match the actual schema.\nResponse: {response_dict}"
+            )
+
+        response_obj = {"question": question, "answer": answer, "context": context}
         return response_obj
     except Exception as e:
-        logger.error(e)
+        if raise_error:
+            raise e
         return {
             "question": question,
-            "answer": "ERROR",
-            "context": "ERROR",
+            "answer": str(e),
+            "context": str(e),
         }
+
+
+def truncate_for_log(s: str, max_length=30):
+    return s if len(s) < max_length else s[:max_length] + "..."
 
 
 def load_jsonl(path: Path) -> list[dict()]:
-    with open(path) as f:
+    with open(path, encoding="utf-8") as f:
         return [json.loads(line) for line in f.readlines()]
 
 
@@ -60,7 +70,19 @@ def run_evaluation(
         testdata = testdata[:num_questions]
 
     logger.info("Sending a test question to the target to ensure it is running...")
-    send_question_to_target("What information is in your knowledge base?", target_url, target_parameters)
+    try:
+        target_data = send_question_to_target(
+            "What information is in your knowledge base?", target_url, target_parameters, raise_error=True
+        )
+        logger.info(
+            'Successfully received response from target: "question": "%s", "answer": "%s", "context": "%s"',
+            truncate_for_log(target_data["question"]),
+            truncate_for_log(target_data["answer"]),
+            truncate_for_log(target_data["context"]),
+        )
+    except Exception as e:
+        logger.error("Failed to send a test question to the target due to error: \n%s", e)
+        return False
 
     # Wrap the target function so that it can be called with a single argument
     async def wrap_target(question: str):
@@ -69,7 +91,6 @@ def run_evaluation(
     logger.info("Starting evaluation...")
     gpt_metrics = ["gpt_coherence", "gpt_relevance", "gpt_groundedness"]
     results = evaluate(
-        evaluation_name="baseline-evaluation",
         target=wrap_target,
         data=testdata,
         task_type="qa",
@@ -89,7 +110,7 @@ def run_evaluation(
 
     logger.info("Evaluation calls have completed. Calculating overall metrics now...")
     eval_results_filename = list(results.artifacts.keys())[0]
-    with open(results_dir / eval_results_filename) as f:
+    with open(results_dir / eval_results_filename, encoding="utf-8") as f:
         questions_with_ratings = [json.loads(question_json) for question_json in f.readlines()]
 
     metrics = {
@@ -129,10 +150,10 @@ def run_evaluation(
     }
 
     # summary statistics
-    with open(results_dir / "summary.json", "w") as summary_file:
+    with open(results_dir / "summary.json", "w", encoding="utf-8") as summary_file:
         summary_file.write(json.dumps(metrics, indent=4))
 
-    with open(results_dir / "evaluate_parameters.json", "w") as parameters_file:
+    with open(results_dir / "evaluate_parameters.json", "w", encoding="utf-8") as parameters_file:
         parameters = {
             "evaluation_gpt_model": openai_config["model"],
             "evaluation_timestamp": int(time.time()),
@@ -143,6 +164,7 @@ def run_evaluation(
         }
         parameters_file.write(json.dumps(parameters, indent=4))
     logger.info("Evaluation results saved in %s", results_dir)
+    return True
 
 
 def process_config(obj: dict):
@@ -158,7 +180,7 @@ def process_config(obj: dict):
                 logger.info("Replaced %s in config with timestamp", key)
                 obj[key] = obj[key].replace("<TIMESTAMP>", str(int(time.time())))
             elif isinstance(obj[key], str) and "<READFILE>" in obj[key]:
-                with open(obj[key].replace("<READFILE>", "")) as f:
+                with open(obj[key].replace("<READFILE>", ""), encoding="utf-8") as f:
                     logger.info("Replaced %s in config with contents of %s", key, f.name)
                     obj[key] = f.read()
 
@@ -166,13 +188,13 @@ def process_config(obj: dict):
 def run_evaluate_from_config(working_dir, config_path, num_questions):
     config_path = working_dir / Path(config_path)
     logger.info("Running evaluation from config %s", config_path)
-    with open(config_path) as f:
+    with open(config_path, encoding="utf-8") as f:
         config = json.load(f)
         process_config(config)
 
     results_dir = working_dir / Path(config["results_dir"])
 
-    run_evaluation(
+    evaluation_run_complete = run_evaluation(
         openai_config=service_setup.get_openai_config(),
         testdata_path=working_dir / config["testdata_path"],
         results_dir=results_dir,
@@ -181,8 +203,11 @@ def run_evaluate_from_config(working_dir, config_path, num_questions):
         num_questions=num_questions,
     )
 
-    results_config_path = results_dir / "config.json"
-    logger.info("Saving original config file back to to %s", results_config_path)
-    with open(config_path) as input_config:
-        with open(results_config_path, "w") as output_config:
-            output_config.write(input_config.read())
+    if evaluation_run_complete:
+        results_config_path = results_dir / "config.json"
+        logger.info("Saving original config file back to to %s", results_config_path)
+        with open(config_path, encoding="utf-8") as input_config:
+            with open(results_config_path, "w", encoding="utf-8") as output_config:
+                output_config.write(input_config.read())
+    else:
+        logger.error("Evaluation was terminated early due to an error ⬆")

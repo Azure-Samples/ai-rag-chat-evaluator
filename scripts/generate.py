@@ -47,6 +47,6 @@ def generate_test_qa_data(
     directory = Path(output_file).parent
     if not directory.exists():
         directory.mkdir(parents=True)
-    with open(output_file, "w") as f:
+    with open(output_file, "w", encoding="utf-8") as f:
         for item in qa:
             f.write(json.dumps(item) + "\n")
