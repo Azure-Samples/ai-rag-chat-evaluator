@@ -168,7 +168,7 @@ python3 -m scripts evaluate --config=example_config.json --numquestions=2
 
 ### Sending additional parameters to the app
 
-This repo assumes that your chat app is following the [Chat App Protocol](TODO), which means that all POST requests look like this:
+This repo assumes that your chat app is following the [Chat App Protocol](https://github.com/Azure-Samples/ai-chat-app-protocol), which means that all POST requests look like this:
 
 ```json
 {"messages": [{"content": "<Actual user question goes here>", "role": "user"}],
