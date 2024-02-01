@@ -105,6 +105,9 @@ There are a few ways to get this data:
 
 This repo includes a script for generating questions and answers from documents stored in Azure AI Search.
 
+> [!IMPORTANT]
+> The generator script can only generate English Q/A pairs right now, due to [limitations in the azure-ai-generative SDK](https://github.com/Azure/azure-sdk-for-python/issues/34099).
+
 1. Create `.env` file by copying `.env.sample`
 2. Fill in the values for your Azure AI Search instance:
 
@@ -207,13 +210,19 @@ located inside the `review-tools` folder.
 
 ### Understanding the GPT metrics
 
-By default, the `evaluate` command will compute the metrics of "gpt_coherence", "gpt_relevance", and "gpt_groundedness".
+By default, the `evaluate` command will use the GPT-4 model to compute the metrics of "gpt_coherence", "gpt_relevance", and "gpt_groundedness". For more details on those metrics and other available GPT metrics, consult the documentation linked from the list below.
+
+> [!IMPORTANT]
+> The GPT metrics are only intended for use on evaluating English language answers, due to [limitations in the azure-ai-generative SDK](https://github.com/Azure/azure-sdk-for-python/issues/34099).
 
 * [coherence](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-coherence) measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language.
 * [relevance](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-relevance) assesses the ability of answers to capture the key points of the context.
 * [groundedness](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-groundedness) assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context.
 
-For more details on those metrics and others, consult the linked documentation.
+The `evaluate` command will also compute two custom metrics:
+
+* `length`: The length of the generated answer, in characters.
+* `answer_has_citation`: Whether the answer contains a correctly formatted citation to a source document, assuming citations are in square brackets.
 
 ### Using the summary tool
 
