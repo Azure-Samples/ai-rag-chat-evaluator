@@ -4,6 +4,7 @@ import re
 import time
 from pathlib import Path
 
+import openai
 import requests
 from azure.ai.generative.evaluate import evaluate
 
@@ -82,6 +83,18 @@ def run_evaluation(
         )
     except Exception as e:
         logger.error("Failed to send a test question to the target due to error: \n%s", e)
+        return False
+
+    logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
+    try:
+        gpt_response = openai.ChatCompletion.create(
+            **openai_config,
+            messages=[{"role": "user", "content": "Hello!"}],
+            n=1,
+        )
+        logger.info("Successfully received response from GPT: %s", gpt_response["choices"][0]["message"]["content"])
+    except Exception as e:
+        logger.error("Failed to send a test chat completion to the GPT deployment due to error: \n%s", e)
         return False
 
     # Wrap the target function so that it can be called with a single argument
