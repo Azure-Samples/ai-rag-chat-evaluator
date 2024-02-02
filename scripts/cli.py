@@ -26,8 +26,7 @@ def evaluate(
     config: Path = typer.Option(
         exists=True, dir_okay=False, file_okay=True, help="Path to config.json", default="config.json"
     ),
-    numquestions: int
-    | None = typer.Option(
+    numquestions: int | None = typer.Option(
         help="Number of questions to evaluate (defaults to all if not specified).", default=None, parser=int_or_none
     ),
 ):
