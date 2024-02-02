@@ -1,7 +1,6 @@
 import logging
 import os
 
-import openai
 from azure.core.credentials import AzureKeyCredential
 from azure.identity import AzureDeveloperCliCredential
 from azure.search.documents import SearchClient
@@ -37,22 +36,6 @@ def get_openai_config():
             "model": os.environ["OPENAI_GPT_MODEL"],
         }
     return openai_config
-
-
-def get_openai_client(oai_config: dict):
-    if oai_config["api_type"].startswith("azure"):
-        return openai.AsyncAzureOpenAI(
-            api_version=oai_config["api_version"],
-            azure_endpoint=oai_config["api_base"],
-            azure_ad_token=oai_config["api_key"],
-            azure_deployment=oai_config["deployment_id"],  # no model?
-        )
-    else:
-        return openai.AsyncOpenAI(
-            api_key=oai_config["api_key"],
-            organization=oai_config["organization"],
-            model=oai_config["model"],
-        )
 
 
 def get_search_client():
