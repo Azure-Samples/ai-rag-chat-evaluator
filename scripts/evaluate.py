@@ -4,7 +4,7 @@ import re
 import time
 from pathlib import Path
 
-import openai
+import pandas as pd
 import requests
 from azure.ai.generative.evaluate import evaluate
 
@@ -22,6 +22,9 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
     }
     try:
         r = requests.post(target_url, headers=headers, json=body)
+        r.encoding = "utf-8"
+
+        latency = r.elapsed.total_seconds()
         response_dict = r.json()
 
         try:
@@ -35,7 +38,7 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
                 f"to match the actual schema.\nResponse: {response_dict}"
             )
 
-        response_obj = {"question": question, "answer": answer, "context": context}
+        response_obj = {"question": question, "answer": answer, "context": context, "latency": latency}
         return response_obj
     except Exception as e:
         if raise_error:
@@ -44,6 +47,7 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
             "question": question,
             "answer": str(e),
             "context": str(e),
+            "latency": -1,
         }
 
 
@@ -54,6 +58,14 @@ def truncate_for_log(s: str, max_length=30):
 def load_jsonl(path: Path) -> list[dict()]:
     with open(path, encoding="utf-8") as f:
         return [json.loads(line) for line in f.readlines()]
+
+
+def answer_length(*, data, **kwargs):
+    return {"answer_length": len(data["answer"])}
+
+
+def has_citation(*, data, **kwargs):
+    return {"has_citation": bool(re.search(r"\[[^\]]+\]", data["answer"]))}
 
 
 def run_evaluation(
@@ -87,18 +99,18 @@ def run_evaluation(
 
     logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
     try:
-        gpt_response = openai.ChatCompletion.create(
-            **openai_config,
+        gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
+            model=openai_config["model"],
             messages=[{"role": "user", "content": "Hello!"}],
             n=1,
         )
-        logger.info("Successfully received response from GPT: %s", gpt_response["choices"][0]["message"]["content"])
+        logger.info("Successfully received response from GPT: %s", gpt_response.choices[0].message.content)
     except Exception as e:
         logger.error("Failed to send a test chat completion to the GPT deployment due to error: \n%s", e)
         return False
 
     # Wrap the target function so that it can be called with a single argument
-    async def wrap_target(question: str):
+    async def wrap_target(question: str, truth: str):
         return send_question_to_target(question, target_url, target_parameters)
 
     logger.info("Starting evaluation...")
@@ -107,15 +119,15 @@ def run_evaluation(
         target=wrap_target,
         data=testdata,
         task_type="qa",
-        metrics_list=gpt_metrics,
+        metrics_list=gpt_metrics + [answer_length, has_citation],
         model_config=openai_config,
         data_mapping={
             # Must match qa.jsonl
             "questions": "question",  # column of data providing input to model
-            "y_test": "truth",  # column of data providing ground truth answer, optional for default metrics
+            "ground_truth": "truth",  # column of data providing ground truth answer, optional for default metrics
             # Must match return value of target function
             "contexts": "context",  # column of data providing context for each input
-            "y_pred": "answer",  # column of data providing output from model
+            "answer": "answer",  # column of data providing output from model
         },
         tracking=False,
         output_path=results_dir,
@@ -128,38 +140,32 @@ def run_evaluation(
 
     metrics = {
         metric_name: {
-            "mean_rating": round(results.metrics_summary[f"mean_{metric_name}"], 2),
+            "mean_rating": round(results.metrics_summary[metric_name], 2),
             "pass_count": 0,
             "pass_rate": 0,
         }
         for metric_name in gpt_metrics
     }
-    total_length = 0
-    max_length = 0
-    min_length = 9999999999
-    total_with_citation = 0
 
-    def passes_threshold(rating):
-        return int(rating) >= 4
-
-    for ind, question_with_rating in enumerate(questions_with_ratings):
-        total_length += len(question_with_rating["answer"])
-        max_length = max(max_length, len(question_with_rating["answer"]))
-        min_length = min(min_length, len(question_with_rating["answer"]))
-        total_with_citation += 1 if re.search(r"\[[^\]]+\]", question_with_rating["answer"]) else 0
-        for metric_name in gpt_metrics:
-            if passes_threshold(question_with_rating[metric_name]):
-                metrics[metric_name]["pass_count"] += 1
-            metrics[metric_name]["pass_rate"] = round(metrics[metric_name]["pass_count"] / (ind + 1), 2)
+    # Calculate aggregate metrics
+    df = pd.DataFrame(questions_with_ratings)
+    for metric_name in gpt_metrics:
+        metrics[metric_name]["mean_rating"] = round(df[metric_name].mean(), 2)
+        metrics[metric_name]["pass_count"] = int(df[metric_name].apply(lambda x: int(x) >= 4).sum())
+        metrics[metric_name]["pass_rate"] = round(metrics[metric_name]["pass_count"] / len(df), 2)
     metrics["answer_length"] = {
-        "total": total_length,
-        "mean": round(total_length / len(questions_with_ratings), 2),
-        "max": max_length,
-        "min": min_length,
+        "mean": round(df["answer_length"].mean(), 2),
+        "max": int(df["answer_length"].max()),
+        "min": int(df["answer_length"].min()),
     }
     metrics["answer_has_citation"] = {
-        "total": total_with_citation,
-        "rate": round(total_with_citation / len(questions_with_ratings), 2),
+        "total": int(df["has_citation"].sum()),
+        "rate": round(df["has_citation"].mean(), 2),
+    }
+    metrics["latency"] = {
+        "mean": round(df["latency"].mean(), 2),
+        "max": df["latency"].max(),
+        "min": df["latency"].min(),
     }
 
     # summary statistics

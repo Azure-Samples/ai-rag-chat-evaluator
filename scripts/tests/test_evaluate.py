@@ -1,3 +1,5 @@
+from datetime import timedelta
+
 import requests
 
 from scripts.evaluate import send_question_to_target
@@ -18,6 +20,7 @@ def test_send_question_to_target_valid():
     assert result["question"] == "Question 1"
     assert result["answer"] == "This is the answer"
     assert result["context"] == "Context 1\n\nContext 2"
+    assert result["latency"] == 1
 
 
 def test_send_question_to_target_missing_error_store():
@@ -88,6 +91,7 @@ def test_send_question_to_target_missing_context():
 class MockResponse:
     def __init__(self, json_data):
         self.json_data = json_data
+        self.elapsed = timedelta(seconds=1)
 
     def json(self):
         return self.json_data
