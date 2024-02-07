@@ -23,10 +23,11 @@ If you open this project in a Dev Container or GitHub Codespaces, it will automa
 If not, then follow these steps:
 
 1. Install Python 3.10 or higher
-2. Install the requirements:
+2. Create a Python [virtual environment](https://learn.microsoft.com/azure/developer/python/get-started?tabs=cmd#configure-python-virtual-environment).
+2. Inside that virtual environment, install the requirements:
 
     ```shell
-    python3 -m pip install -r requirements.txt
+    python -m pip install -r requirements.txt
     ```
 
 ## Deploying a GPT-4 model
@@ -123,7 +124,7 @@ This repo includes a script for generating questions and answers from documents 
 3. Run the generator script:
 
     ```shell
-    python3 -m scripts generate --output=example_input/qa.jsonl --numquestions=200 --persource=5
+    python -m scripts generate --output=example_input/qa.jsonl --numquestions=200 --persource=5
     ```
 
     That script will generate 200 questions and answers, and store them in `example_input/qa.jsonl`. We've already provided an example based off the sample documents for this app.
@@ -136,7 +137,7 @@ This repo includes a script for generating questions and answers from documents 
 We provide a script that loads in the current `azd` environment's variables, installs the requirements for the evaluation, and runs the evaluation against the local app. Run it like this:
 
 ```shell
-python3 -m scripts evaluate --config=example_config.json
+python -m scripts evaluate --config=example_config.json
 ```
 
 The config.json should contain these fields as a minimum:
@@ -166,7 +167,7 @@ To run against a deployed endpoint, change the `target_url` to the chat endpoint
 It's common to run the evaluation on a subset of the questions, to get a quick sense of how the changes are affecting the answers. To do this, use the `--numquestions` parameter:
 
 ```shell
-python3 -m scripts evaluate --config=example_config.json --numquestions=2
+python -m scripts evaluate --config=example_config.json --numquestions=2
 ```
 
 ### Sending additional parameters to the app
@@ -229,7 +230,7 @@ The `evaluate` command will also compute two custom metrics:
 To view a summary across all the runs, use the `summary` command with the path to the results folder:
 
 ```bash
-python3 -m review_tools summary example_results
+python -m review_tools summary example_results
 ```
 
 This will display an interactive table with the results for each run, like this:
@@ -244,7 +245,7 @@ A modal will appear with the parameters, including any prompt override.
 To compare the answers generated for each question across 2 runs, use the `compare` command with 2 paths:
 
 ```bash
-python3 -m review_tools diff example_results/baseline_1 example_results/baseline_2
+python -m review_tools diff example_results/baseline_1 example_results/baseline_2
 ```
 
 This will display each question, one at a time, with the two generated answers in scrollable panes,
