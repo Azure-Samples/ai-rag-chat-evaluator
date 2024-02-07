@@ -147,10 +147,7 @@ def run_evaluation(
         for metric_name in gpt_metrics
     }
 
-    # use pandas to calculate mean, max, min, and pass rate for each metric
-    # also calculate mean, max, min for answer length and citation rate
-    # and total number of questions with citation
-    # turn into dataframe
+    # Calculate aggregate metrics
     df = pd.DataFrame(questions_with_ratings)
     for metric_name in gpt_metrics:
         metrics[metric_name]["mean_rating"] = round(df[metric_name].mean(), 2)
