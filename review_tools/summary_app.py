@@ -32,7 +32,7 @@ class TableApp(App):
     def __init__(self, results_dir: Path) -> None:
         super().__init__()
         self.rows = [
-            ("folder", "groundedness", "%", "relevance", "%", "coherence", "%", "citation %", "length"),
+            ("folder", "groundedness", "%", "relevance", "%", "coherence", "%", "citation %", "length", "latency"),
         ]
         self.row_parameters = {}
         folders = [f for f in os.listdir(results_dir) if os.path.isdir(os.path.join(results_dir, f))]
@@ -54,6 +54,7 @@ class TableApp(App):
                         coherence["pass_rate"],
                         citation,
                         summary.get("answer_length", {}).get("mean", "Unknown"),
+                        summary.get("latency", {}).get("mean", "Unknown"),
                     )
                 )
             with open(Path(results_dir) / folder / "evaluate_parameters.json") as f:

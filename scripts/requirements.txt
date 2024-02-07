@@ -1,7 +1,7 @@
 requests
 python-dotenv
-azureml-metrics[generative-ai]==0.0.42
-azure-ai-generative==1.0.0b2
+azure-ai-generative[evaluate]==1.0.0b6
 azure-search-documents
 typer
-openai==0.28.1
+openai>=1.0.0
+pandas
