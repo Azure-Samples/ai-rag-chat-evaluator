@@ -197,7 +197,9 @@ def run_evaluate_from_config(working_dir, config_path, num_questions):
         target_url=config["target_url"],
         target_parameters=config.get("target_parameters", {}),
         num_questions=num_questions,
-        requested_metrics=config.get("requested_metrics", []),
+        requested_metrics=config.get(
+            "requested_metrics", ["groundedness", "relevance", "coherence", "has_citation", "answer_length"]
+        ),
     )
 
     if evaluation_run_complete:
