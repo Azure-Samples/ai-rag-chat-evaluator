@@ -1,6 +1,7 @@
 {
     "testdata_path": "example_input/qa.jsonl",
     "results_dir": "example_results/experiment<TIMESTAMP>",
+    "requested_metrics": ["relevance", "coherence", "groundedness", "latency", "answer_length"],
     "target_url": "http://localhost:50505/chat",
     "target_parameters": {
         "overrides": {

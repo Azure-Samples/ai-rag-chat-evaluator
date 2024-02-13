@@ -41,7 +41,7 @@ class DiffApp(App):
                         yield Markdown(id=f"answer{ind}")
             with Horizontal(id="metrics"):
                 for ind in range(len(self.directories)):
-                    yield DataTable(id=f"metrics{ind}", show_cursor=False)
+                    yield DataTable(id=f"metrics{ind}", show_cursor=False, cell_padding=1)
             with Horizontal(id="buttons"):
                 yield Button.success("Next question", classes="button")
                 yield Button.error("Quit", id="quit", classes="button")
@@ -50,13 +50,25 @@ class DiffApp(App):
         question = list(self.data_dicts[0].keys())[self.result_index]
         self.query_one("#question", Static).update(question)
 
-        metrics = ("groundedness", "relevance", "coherence")
         for ind in range(len(self.directories)):
-            self.query_one(f"#answer{ind}", Markdown).update(self.data_dicts[ind][question]["answer"])
-            data_metrics = [self.data_dicts[ind][question].get(f"gpt_{metric}", "Unknown") for metric in metrics]
+            try:
+                self.query_one(f"#answer{ind}", Markdown).update(self.data_dicts[ind][question]["answer"])
+            except KeyError:
+                self.query_one(f"#answer{ind}", Markdown).update("No answer found for that question")
+                continue
+
+            # Find all fields in the result that have numeric values
+            metric_columns = []
+            metric_values = []
+            question_results = self.data_dicts[ind][question]
+            for column, value in question_results.items():
+                if isinstance(value, int | float):
+                    metric_columns.append(column)
+                    metric_values.append(round(value, 1) if isinstance(value, float) else value)
             datatable = self.query_one(f"#metrics{ind}", DataTable)
-            datatable.clear(columns=True).add_columns(*metrics)
-            datatable.add_row(*data_metrics)
+            datatable.clear(columns=True).add_columns(*metric_columns)
+            datatable.add_row(*metric_values)
+            datatable.add_row("" * len(metric_columns))
 
         self.result_index += 1
 

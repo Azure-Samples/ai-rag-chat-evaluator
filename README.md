@@ -16,6 +16,7 @@ Table of contents:
 * [Deploying a GPT-4 model](#deploying-a-gpt-4-model)
 * [Generating ground truth data](#generating-ground-truth-data)
 * [Running an evaluation](#running-an-evaluation)
+* [Viewing the results](#viewing-the-results)
 
 ## Setting up this project
 
@@ -146,6 +147,7 @@ The config.json should contain these fields as a minimum:
 {
     "testdata_path": "example_input/qa.jsonl",
     "target_url": "http://localhost:50505/chat",
+    "requested_metrics": ["groundedness", "relevance", "coherence", "latency", "answer_length"],
     "results_dir": "example_results/experiment<TIMESTAMP>"
 }
 ```
@@ -169,6 +171,40 @@ It's common to run the evaluation on a subset of the questions, to get a quick s
 ```shell
 python -m scripts evaluate --config=example_config.json --numquestions=2
 ```
+
+### Specifying the evaluate metrics
+
+Rhe `evaluate` command will use the metrics specified in the `requested_metrics` field of the config JSON.
+Some of those metrics are built-in to the evaluation SDK, and the rest are custom metrics that we've added.
+
+#### Built-in metrics
+
+These metrics are calculated by sending a call to the GPT model, asking it to provide a 1-5 rating, and storing that rating.
+
+> [!IMPORTANT]
+> The built-in metrics are only intended for use on evaluating English language answers, due to [limitations in the azure-ai-generative SDK](https://github.com/Azure/azure-sdk-for-python/issues/34099).
+
+* [`gpt_coherence`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-coherence) measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language.
+* [`gpt_relevance`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-relevance) assesses the ability of answers to capture the key points of the context.
+* [`gpt_groundedness`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-groundedness) assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context.
+
+#### Custom metrics
+
+##### Prompt metrics
+
+The following metrics are implemented very similar to the built-in metrics, but use a locally stored prompt. They're a great fit if you find that the built-in metrics are not working well for you or if you need to translate the prompt to another language.
+
+* `coherence`: Measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language. Based on `scripts/evaluate_metrics/prompts/coherence.jinja2`.
+* `relevance`: Assesses the ability of answers to capture the key points of the context. Based on `scripts/evaluate_metrics/prompts/relevance.jinja2`.
+* `groundedness`: Assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context. Based on `scripts/evaluate_metrics/prompts/groundedness.jinja2`.
+
+##### Code metrics
+
+These metrics are calculated with some local code based on the results of the chat app, and do not require a call to the GPT model.
+
+* `latency`: The time it takes for the chat app to generate an answer, in seconds.
+* `length`: The length of the generated answer, in characters.
+* `answer_has_citation`: Whether the answer contains a correctly formatted citation to a source document, assuming citations are in square brackets.
 
 ### Sending additional parameters to the app
 
@@ -209,21 +245,6 @@ Inside each run's folder, you'll find:
 To make it easier to view and compare results across runs, we've built a few tools,
 located inside the `review-tools` folder.
 
-### Understanding the GPT metrics
-
-By default, the `evaluate` command will use the GPT-4 model to compute the metrics of "gpt_coherence", "gpt_relevance", and "gpt_groundedness". For more details on those metrics and other available GPT metrics, consult the documentation linked from the list below.
-
-> [!IMPORTANT]
-> The GPT metrics are only intended for use on evaluating English language answers, due to [limitations in the azure-ai-generative SDK](https://github.com/Azure/azure-sdk-for-python/issues/34099).
-
-* [coherence](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-coherence) measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language.
-* [relevance](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-relevance) assesses the ability of answers to capture the key points of the context.
-* [groundedness](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-groundedness) assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context.
-
-The `evaluate` command will also compute two custom metrics:
-
-* `length`: The length of the generated answer, in characters.
-* `answer_has_citation`: Whether the answer contains a correctly formatted citation to a source document, assuming citations are in square brackets.
 
 ### Using the summary tool
 

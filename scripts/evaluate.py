@@ -1,6 +1,5 @@
 import json
 import logging
-import re
 import time
 from pathlib import Path
 
@@ -9,6 +8,7 @@ import requests
 from azure.ai.generative.evaluate import evaluate
 
 from . import service_setup
+from .evaluate_metrics import metrics_by_name
 
 logger = logging.getLogger("scripts")
 
@@ -55,17 +55,9 @@ def truncate_for_log(s: str, max_length=30):
     return s if len(s) < max_length else s[:max_length] + "..."
 
 
-def load_jsonl(path: Path) -> list[dict()]:
+def load_jsonl(path: Path) -> list[dict]:
     with open(path, encoding="utf-8") as f:
         return [json.loads(line) for line in f.readlines()]
-
-
-def answer_length(*, data, **kwargs):
-    return {"answer_length": len(data["answer"])}
-
-
-def has_citation(*, data, **kwargs):
-    return {"has_citation": bool(re.search(r"\[[^\]]+\]", data["answer"]))}
 
 
 def run_evaluation(
@@ -74,6 +66,7 @@ def run_evaluation(
     results_dir: Path,
     target_url: str,
     target_parameters={},
+    requested_metrics=[],
     num_questions=None,
 ):
     logger.info("Running evaluation using data from %s", testdata_path)
@@ -114,12 +107,20 @@ def run_evaluation(
         return send_question_to_target(question, target_url, target_parameters)
 
     logger.info("Starting evaluation...")
-    gpt_metrics = ["gpt_coherence", "gpt_relevance", "gpt_groundedness"]
+    for metric in requested_metrics:
+        if metric not in metrics_by_name:
+            logger.error(f"Requested metric {metric} is not available. Available metrics: {metrics_by_name.keys()}")
+            return False
+
+    requested_metrics = [
+        metrics_by_name[metric_name] for metric_name in requested_metrics if metric_name in metrics_by_name
+    ]
+
     results = evaluate(
         target=wrap_target,
         data=testdata,
         task_type="qa",
-        metrics_list=gpt_metrics + [answer_length, has_citation],
+        metrics_list=[metric.get_metric() for metric in requested_metrics],
         model_config=openai_config,
         data_mapping={
             # Must match qa.jsonl
@@ -138,39 +139,15 @@ def run_evaluation(
     with open(results_dir / eval_results_filename, encoding="utf-8") as f:
         questions_with_ratings = [json.loads(question_json) for question_json in f.readlines()]
 
-    metrics = {
-        metric_name: {
-            "mean_rating": round(results.metrics_summary[metric_name], 2),
-            "pass_count": 0,
-            "pass_rate": 0,
-        }
-        for metric_name in gpt_metrics
-    }
-
     # Calculate aggregate metrics
     df = pd.DataFrame(questions_with_ratings)
-    for metric_name in gpt_metrics:
-        metrics[metric_name]["mean_rating"] = round(df[metric_name].mean(), 2)
-        metrics[metric_name]["pass_count"] = int(df[metric_name].apply(lambda x: int(x) >= 4).sum())
-        metrics[metric_name]["pass_rate"] = round(metrics[metric_name]["pass_count"] / len(df), 2)
-    metrics["answer_length"] = {
-        "mean": round(df["answer_length"].mean(), 2),
-        "max": int(df["answer_length"].max()),
-        "min": int(df["answer_length"].min()),
-    }
-    metrics["answer_has_citation"] = {
-        "total": int(df["has_citation"].sum()),
-        "rate": round(df["has_citation"].mean(), 2),
-    }
-    metrics["latency"] = {
-        "mean": round(df["latency"].mean(), 2),
-        "max": df["latency"].max(),
-        "min": df["latency"].min(),
-    }
+    summary = {}
+    for metric in requested_metrics:
+        summary[metric.METRIC_NAME] = metric.get_aggregate_stats(df)
 
     # summary statistics
     with open(results_dir / "summary.json", "w", encoding="utf-8") as summary_file:
-        summary_file.write(json.dumps(metrics, indent=4))
+        summary_file.write(json.dumps(summary, indent=4))
 
     with open(results_dir / "evaluate_parameters.json", "w", encoding="utf-8") as parameters_file:
         parameters = {
@@ -220,6 +197,7 @@ def run_evaluate_from_config(working_dir, config_path, num_questions):
         target_url=config["target_url"],
         target_parameters=config.get("target_parameters", {}),
         num_questions=num_questions,
+        requested_metrics=config.get("requested_metrics", []),
     )
 
     if evaluation_run_complete:
