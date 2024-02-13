@@ -5,19 +5,19 @@ class AnswerLengthMetric:
 
     METRIC_NAME = "answer_length"
 
-    @staticmethod
-    def get_metric():
+    @classmethod
+    def get_metric(cls):
         def answer_length(*, data, **kwargs):
-            return {"answer_length": len(data["answer"])}
+            return {AnswerLengthMetric.METRIC_NAME: len(data["answer"])}
 
         return answer_length
 
-    @staticmethod
-    def get_aggregate_stats(df):
+    @classmethod
+    def get_aggregate_stats(cls, df):
         return {
-            "mean": round(df["answer_length"].mean(), 2),
-            "max": int(df["answer_length"].max()),
-            "min": int(df["answer_length"].min()),
+            "mean": round(df[cls.METRIC_NAME].mean(), 2),
+            "max": int(df[cls.METRIC_NAME].max()),
+            "min": int(df[cls.METRIC_NAME].min()),
         }
 
 
@@ -25,18 +25,18 @@ class HasCitationMetric:
 
     METRIC_NAME = "has_citation"
 
-    @staticmethod
-    def get_metric():
+    @classmethod
+    def get_metric(cls):
         def has_citation(*, data, **kwargs):
             return {"has_citation": bool(re.search(r"\[[^\]]+\]", data["answer"]))}
 
         return has_citation
 
-    @staticmethod
-    def get_aggregate_stats(df):
+    @classmethod
+    def get_aggregate_stats(cls, df):
         return {
-            "total": int(df["has_citation"].sum()),
-            "rate": round(df["has_citation"].mean(), 2),
+            "total": int(df[cls.METRIC_NAME].sum()),
+            "rate": round(df[cls.METRIC_NAME].mean(), 2),
         }
 
 
@@ -44,17 +44,18 @@ class LatencyMetric:
 
     METRIC_NAME = "latency"
 
-    @staticmethod
-    def get_metric():
+    @classmethod
+    def get_metric(cls):
         def latency(*, data, **kwargs):
+            # Return no additional data, since latency is already stored in the target response
             return {}
 
         return latency
 
-    @staticmethod
-    def get_aggregate_stats(df):
+    @classmethod
+    def get_aggregate_stats(cls, df):
         return {
-            "mean": round(df["latency"].mean(), 2),
-            "max": df["latency"].max(),
-            "min": df["latency"].min(),
+            "mean": round(df[cls.METRIC_NAME].mean(), 2),
+            "max": df[cls.METRIC_NAME].max(),
+            "min": df[cls.METRIC_NAME].min(),
         }
