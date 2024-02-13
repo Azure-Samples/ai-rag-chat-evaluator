@@ -1,0 +1,12 @@
+#table {
+    height: 100%;
+}
+
+#buttons {
+    height: 3;
+    align: center middle;
+}
+
+#quit {
+    margin-left: 5;
+}

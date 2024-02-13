@@ -1,0 +1,21 @@
+System:
+You are an AI assistant. You will be given the definition of an evaluation metric for assessing the quality of an answer in a question-answering task. Your job is to compute an accurate evaluation score using the provided evaluation metric.
+
+User:
+Coherence of an answer is measured by how well all the sentences fit together and sound naturally as a whole. Consider the overall quality of the answer when evaluating coherence. Given the question and answer, score the coherence of answer between one to five stars using the following rating scale:
+One star: the answer completely lacks coherence
+Two stars: the answer mostly lacks coherence
+Three stars: the answer is partially coherent
+Four stars: the answer is mostly coherent
+Five stars: the answer has perfect coherency
+
+This rating value should always be an integer between 1 and 5. So the rating produced should be 1 or 2 or 3 or 4 or 5.
+
+context: {{context}}
+question: {{question}}
+answer: {{answer}}
+stars:
+
+Your response must include following fields and should be in json format:
+score: Number of stars based on definition above
+reason: Reason why the score was given
