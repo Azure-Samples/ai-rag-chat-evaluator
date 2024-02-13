@@ -60,7 +60,7 @@ def get_openai_client(oai_config: dict):
             api_key=oai_config["api_key"] if os.environ.get("AZURE_OPENAI_KEY") else None,
             azure_ad_token=None if os.environ.get("AZURE_OPENAI_KEY") else oai_config["api_key"],
             azure_deployment=oai_config["deployment_id"],
-    )
+        )
     else:
         return openai.OpenAI(
             api_key=oai_config["api_key"],
