@@ -174,7 +174,7 @@ python -m scripts evaluate --config=example_config.json --numquestions=2
 
 ### Specifying the evaluate metrics
 
-Rhe `evaluate` command will use the metrics specified in the `requested_metrics` field of the config JSON.
+The `evaluate` command will use the metrics specified in the `requested_metrics` field of the config JSON.
 Some of those metrics are built-in to the evaluation SDK, and the rest are custom metrics that we've added.
 
 #### Built-in metrics
