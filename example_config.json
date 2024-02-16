@@ -5,8 +5,8 @@
     "target_url": "http://localhost:50505/chat",
     "target_parameters": {
         "overrides": {
-            "prompt_template": "<READFILE>example_input/prompt_refined.txt",
-            "semantic_ranker": false
+            "semantic_ranker": false,
+            "prompt_template": "<READFILE>example_input/prompt_refined.txt"
         }
     }
 }
