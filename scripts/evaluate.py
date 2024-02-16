@@ -123,11 +123,12 @@ def run_evaluation(
         metrics_list=[metric.get_metric() for metric in requested_metrics],
         model_config=openai_config,
         data_mapping={
-            # Must match qa.jsonl
-            "questions": "question",  # column of data providing input to model
+            # The keys in this dictionary must match the variable names of the built-in prompt templates
+            # These values must match field names in qa.jsonl:
+            "question": "question",  # column of data providing input to model
             "ground_truth": "truth",  # column of data providing ground truth answer, optional for default metrics
-            # Must match return value of target function
-            "contexts": "context",  # column of data providing context for each input
+            # These values must match field names in return value of target function:
+            "context": "context",  # column of data providing context for each input
             "answer": "answer",  # column of data providing output from model
         },
         tracking=False,
