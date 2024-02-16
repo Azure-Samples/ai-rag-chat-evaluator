@@ -1,4 +1,7 @@
-class BuiltinRatingMetric:
+from .base_metric import BaseMetric
+
+
+class BuiltinRatingMetric(BaseMetric):
 
     @classmethod
     def get_metric(cls):
@@ -6,12 +9,7 @@ class BuiltinRatingMetric:
 
     @classmethod
     def get_aggregate_stats(cls, df):
-        pass_count = int(df[cls.METRIC_NAME].apply(lambda x: int(x) >= 4).sum())
-        return {
-            "mean_rating": round(df[cls.METRIC_NAME].mean(), 2),
-            "pass_count": pass_count,
-            "pass_rate": round(pass_count / len(df), 2),
-        }
+        return cls.get_aggregate_stats_for_numeric_rating(df, cls.METRIC_NAME)
 
 
 class BuiltinRelevanceMetric(BuiltinRatingMetric):
