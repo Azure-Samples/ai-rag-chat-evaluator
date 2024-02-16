@@ -39,6 +39,7 @@ class TableApp(App):
 
         run_summaries = {}
         folders = [f for f in os.listdir(results_dir) if os.path.isdir(os.path.join(results_dir, f))]
+        folders.sort()
         for folder in folders:
             with open(Path(results_dir) / folder / "summary.json") as f:
                 summary = json.load(f)

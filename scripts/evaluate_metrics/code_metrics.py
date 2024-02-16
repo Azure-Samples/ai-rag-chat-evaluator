@@ -1,7 +1,9 @@
 import re
 
+from .base_metric import BaseMetric
 
-class AnswerLengthMetric:
+
+class AnswerLengthMetric(BaseMetric):
 
     METRIC_NAME = "answer_length"
 
@@ -21,7 +23,7 @@ class AnswerLengthMetric:
         }
 
 
-class HasCitationMetric:
+class HasCitationMetric(BaseMetric):
 
     METRIC_NAME = "has_citation"
 
@@ -40,7 +42,7 @@ class HasCitationMetric:
         }
 
 
-class LatencyMetric:
+class LatencyMetric(BaseMetric):
 
     METRIC_NAME = "latency"
 

@@ -57,6 +57,14 @@ def test_custom_groundedness():
     assert metric.get_aggregate_stats(df) == {"mean_rating": 4.0, "pass_count": 2, "pass_rate": 0.67}
 
 
+def test_custom_relevance_missing_values():
+    metric = prompt_metrics.RelevanceMetric()
+
+    assert isinstance(metric.get_metric(), PromptMetric)
+    df = pd.DataFrame([{"relevance_score": 2}, {"relevance_score": 4}, {"relevance_score": "Failed"}])
+    assert metric.get_aggregate_stats(df) == {"mean_rating": 3.0, "pass_count": 1, "pass_rate": 0.33}
+
+
 def test_builtin_coherence():
     metric = builtin_metrics.BuiltinCoherenceMetric()
     assert metric.get_metric() == "gpt_coherence"
@@ -76,3 +84,10 @@ def test_builtin_groundedness():
     assert metric.get_metric() == "gpt_groundedness"
     df = pd.DataFrame([{"gpt_groundedness": 5}, {"gpt_groundedness": 4}, {"gpt_groundedness": 3}])
     assert metric.get_aggregate_stats(df) == {"mean_rating": 4.0, "pass_count": 2, "pass_rate": 0.67}
+
+
+def test_builtin_coherence_missing_values():
+    metric = builtin_metrics.BuiltinCoherenceMetric()
+    assert metric.get_metric() == "gpt_coherence"
+    df = pd.DataFrame([{"gpt_coherence": "Failed"}, {"gpt_coherence": 4}, {"gpt_coherence": 3}])
+    assert metric.get_aggregate_stats(df) == {"mean_rating": 3.5, "pass_count": 1, "pass_rate": 0.33}
