@@ -42,6 +42,29 @@ class HasCitationMetric(BaseMetric):
         }
 
 
+class CitationMatchMetric(BaseMetric):
+
+    METRIC_NAME = "citation_match"
+
+    @classmethod
+    def get_metric(cls):
+        def citation_match(*, data, **kwargs):
+            # Return true if all citations in the truth are present in the answer
+            truth_citations = set(re.findall(r"\[[^\]]+\]", data["truth"]))
+            answer_citations = set(re.findall(r"\[[^\]]+\]", data["answer"]))
+            citation_match = truth_citations.issubset(answer_citations)
+            return {"citation_match": citation_match}
+
+        return citation_match
+
+    @classmethod
+    def get_aggregate_stats(cls, df):
+        return {
+            "total": int(df[cls.METRIC_NAME].sum()),
+            "rate": round(df[cls.METRIC_NAME].mean(), 2),
+        }
+
+
 class LatencyMetric(BaseMetric):
 
     METRIC_NAME = "latency"

@@ -1,6 +1,6 @@
 from .builtin_metrics import BuiltinCoherenceMetric, BuiltinGroundednessMetric, BuiltinRelevanceMetric
 from .code_metrics import AnswerLengthMetric, HasCitationMetric, LatencyMetric
-from .prompt_metrics import CoherenceMetric, GroundednessMetric, RelevanceMetric
+from .prompt_metrics import CoherenceMetric, DontKnownessMetric, GroundednessMetric, RelevanceMetric
 
 metrics = [
     BuiltinCoherenceMetric,
@@ -9,6 +9,7 @@ metrics = [
     CoherenceMetric,
     RelevanceMetric,
     GroundednessMetric,
+    DontKnownessMetric,
     LatencyMetric,
     AnswerLengthMetric,
     HasCitationMetric,

@@ -275,3 +275,64 @@ and the GPT metrics below each answer.
 ![Screenshot of CLI tool for comparing a question with 2 answers](docs/screenshot_compare.png)]
 
 Use the buttons at the bottom to navigate to the next question or quit the tool.
+
+## Measuring app's ability to say "I don't know"
+
+The evaluation flow described above focused on evaluating a model’s answers for a set of questions that *could* be answered by the data. But what about all those questions that can’t be answered by the data? Does your model know how to say “I don’t know?” The GPT models are trained to try and be helpful, so their tendency is to always give some sort of answer, especially for answers that were in their training data. If you want to ensure your app can say “I don’t know” when it should, you need to evaluate it on a different set of questions with a different metric.
+
+### Generating ground truth data for answer-less questions
+
+For this evaluation, our ground truth data needs to be a set of question whose answer should provoke an "I don’t know" response from the data. There are several categories of such questions:
+
+* **Unknowable**: Questions that are related to the sources but not actually in them (and not public knowledge).
+* **Uncitable**: Questions whose answers are well known to the LLM from its training data, but are not in the sources. There are two flavors of these:
+    * **Related**: Similar topics to sources, so LLM will be particularly tempted to think the sources know.
+    * **Unrelated**: Completely unrelated to sources, so LLM shouldn’t be as tempted to think the sources know.
+* **Nonsensical**: Questions that are non-questions, that a human would scratch their head at and ask for clarification.
+
+You can write these questions manually, but it’s also possible to generate them using a generator script in this repo,
+assuming you already have ground truth data with answerable questions.
+
+```shell
+python -m scripts generate_dontknows --input=example_input/qa.jsonl --output=example_input/qa_dontknows.jsonl --numquestions=45
+```
+
+That script sends the current questions to the configured GPT-4 model along with prompts to generate questions of each kind.
+
+When it’s done, you should review and curate the resulting ground truth data. Pay special attention to the "unknowable" questions at the top of the file, since you may decide that some of those are actually knowable, and you may want to reword or rewrite entirely.
+
+### Running an evaluation for answer-less questions
+
+This repo contains a custom GPT metric called "dontknowness" that rates answers from 1-5, where 1 is "answered the question completely with no certainty" and 5 is "said it didn't know and attempted no answer". The goal is for all answers to be rated 4 or 5.
+
+Here's an example configuration JSON that requests that metric, referencing the new ground truth data and a new output folder:
+
+```json
+{
+    "testdata_path": "example_input/qa_dontknows.jsonl",
+    "results_dir": "example_results_dontknows/baseline",
+    "requested_metrics": ["dontknowness", "answer_length", "latency", "has_citation"],
+    "target_url": "http://localhost:50505/chat",
+    "target_parameters": {
+    }
+}
+```
+
+We recommend a separate output folder, as you'll likely want to make multiple runs and easily compare between those runs using the [review tools](#viewing-the-results).
+
+Run the evaluation like this:
+
+```shell
+python -m scripts evaluate --config=example_config_dontknows.json
+```
+
+The results will be stored in the `results_dir` folder, and can be reviewed using the [review tools](#viewing-the-results).
+
+### Improving the app's ability to say "I don't know"
+
+If the app is not saying "I don't know" enough, you can use the `diff` tool to compare the answers for the "dontknows" questions across runs, and see if the answers are improving. Changes you can try:
+
+* Adjust the prompt to encourage the model to say "I don't know" more often. Remove anything in the prompt that might be distracting or overly encouraging it to answer.
+* Try using GPT-4 instead of GPT-3.5. The results will be slower (see the latency column) but it may be more likely to say "I don't know" when it should.
+* Adjust the temperature of the model used by your app.
+* Add an additional LLM step in your app after generating the answer, to have the LLM rate its own confidence that the answer is found in the sources. If the confidence is low, the app should say "I don't know".

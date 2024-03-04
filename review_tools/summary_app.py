@@ -49,7 +49,9 @@ class TableApp(App):
                     metric_counts[metric_name] = metric_counts.get(metric_name, 0) + 1
 
         # Only show metrics that have shown up at least twice across runs
-        shared_metric_names = [metric_name for metric_name, count in metric_counts.items() if count > 1]
+        shared_metric_names = [
+            metric_name for metric_name, count in metric_counts.items() if count > 1 or len(run_summaries) == 1
+        ]
         shared_metric_stats = {metric_name: set() for metric_name in shared_metric_names}
 
         # Now figure out what stat to show about each metric

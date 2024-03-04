@@ -24,6 +24,23 @@ def test_has_citation():
     assert metric.get_aggregate_stats(df) == {"total": 2, "rate": 0.67}
 
 
+def test_citation_match():
+    metric = code_metrics.CitationMatchMetric()
+    metric_function = metric.get_metric()
+    assert callable(metric_function)
+    assert metric_function(data={"truth": "answer in [file.pdf]", "answer": "answer in [file2.pdf]"}) == {
+        "citation_match": False
+    }
+    assert metric_function(data={"truth": "answer in [file2.pdf]", "answer": "answer in [file2.pdf]"}) == {
+        "citation_match": True
+    }
+    assert metric_function(data={"truth": "answer in [file2.pdf]", "answer": "answer in [file1.pdf][file2.pdf]"}) == {
+        "citation_match": True
+    }
+    df = pd.DataFrame([{"citation_match": True}, {"citation_match": False}, {"citation_match": True}])
+    assert metric.get_aggregate_stats(df) == {"total": 2, "rate": 0.67}
+
+
 def test_latency():
     metric = code_metrics.LatencyMetric()
     metric_function = metric.get_metric()
