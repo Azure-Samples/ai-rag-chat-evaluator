@@ -31,3 +31,8 @@ class CoherenceMetric(CustomRatingMetric):
 class GroundednessMetric(CustomRatingMetric):
 
     METRIC_NAME = "groundedness"
+
+
+class DontKnownessMetric(CustomRatingMetric):
+
+    METRIC_NAME = "dontknowness"
