@@ -10,9 +10,10 @@ from textual.widgets import Button, DataTable, Markdown, Static
 class DiffApp(App):
     CSS_PATH = "diff_app.tcss"
 
-    def __init__(self, directory1: Path, directory2: Path):
+    def __init__(self, directory1: Path, directory2: Path = None):
         super().__init__()
-        self.directories = [directory1, directory2]
+        # Only include the first directory if the second is not provided
+        self.directories = [directory1] if directory2 is None else [directory1, directory2]
         self.data_dicts = []  # Store dicts keyed by question
         self.result_index = 0  # Based on results in the first directory
 
@@ -35,10 +36,15 @@ class DiffApp(App):
             with Horizontal(id="sources"):
                 for directory in self.directories:
                     yield Static(directory.name, classes="source")
+                if len(self.directories) == 1:
+                    yield Static("Ground truth answer", classes="source")
             with Horizontal(id="answers"):
                 for ind in range(len(self.directories)):
                     with VerticalScroll(classes="answer"):
                         yield Markdown(id=f"answer{ind}")
+                if len(self.directories) == 1:
+                    with VerticalScroll(classes="answer"):
+                        yield Markdown(id="answer_truth")
             with Horizontal(id="metrics"):
                 for ind in range(len(self.directories)):
                     yield DataTable(id=f"metrics{ind}", show_cursor=False, cell_padding=1)
@@ -47,12 +53,17 @@ class DiffApp(App):
                 yield Button.error("Quit", id="quit", classes="button")
 
     def next_question(self):
+        if self.result_index >= len(self.data_dicts[0]):
+            self.exit()
+            return
         question = list(self.data_dicts[0].keys())[self.result_index]
         self.query_one("#question", Static).update(question)
 
         for ind in range(len(self.directories)):
             try:
                 self.query_one(f"#answer{ind}", Markdown).update(self.data_dicts[ind][question]["answer"])
+                if len(self.directories) == 1:
+                    self.query_one("#answer_truth", Markdown).update(self.data_dicts[0][question]["truth"])
             except KeyError:
                 self.query_one(f"#answer{ind}", Markdown).update("No answer found for that question")
                 continue
