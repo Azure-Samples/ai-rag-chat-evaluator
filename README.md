@@ -17,6 +17,7 @@ Table of contents:
 * [Generating ground truth data](#generating-ground-truth-data)
 * [Running an evaluation](#running-an-evaluation)
 * [Viewing the results](#viewing-the-results)
+* [Measuring app's ability to say "I don't know"](#measuring-apps-ability-to-say-i-dont-know)
 
 ## Setting up this project
 
