@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Review answers</title>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.datatables.net/2.0.2/css/dataTables.dataTables.css"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Review answers</h1>
+
+      <label
+        >Select an <code>eval_results.jsonl</code> file to review:
+        <input type="file" id="input" multiple />
+      </label>
+
+      <table id="jsonlTable" class="table">
+        <thead id="tableHead"></thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="exampleModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title fs-5" id="exampleModalLabel">
+              <div id="question"></div>
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h5>Answer:</h5>
+            <div id="answer"></div>
+            <br />
+            <h5>Truth:</h5>
+            <div id="truth"></div>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+            <button type="button" class="btn btn-primary">Save changes</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://cdn.datatables.net/2.0.2/js/dataTables.js"></script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      DataTable.render.ellipsis = function (cutoff) {
+        return function (data, type, row) {
+          if (type === "display") {
+            var str = data.toString(); // cast numbers
+
+            return str.length < cutoff
+              ? str
+              : str.substr(0, cutoff - 1) + "&#8230;";
+          }
+
+          // Search, order and type can use the original data
+          return data;
+        };
+      };
+
+      function renderTable(data) {
+        var lines = data.split("\n");
+        var jsonObjects = lines.map((line) =>
+          line === "" ? null : JSON.parse(line)
+        );
+        // Remove the last element if it is null
+        if (jsonObjects[jsonObjects.length - 1] === null) {
+          jsonObjects.pop();
+        }
+        var keys = Object.keys(jsonObjects[0]);
+        // only include keys that are int or float or bool
+        keys = keys.filter((key) => {
+          var val = jsonObjects[0][key];
+          return typeof val === "number" || typeof val === "boolean";
+        });
+        var columns = ["question", "answer"].concat(keys);
+        var thead = $("#tableHead");
+        var tbody = $("#tableBody");
+
+        var headRow = $("<tr>");
+        columns.forEach((column) => {
+          // if column ends with _score, remove _score
+          headRow.append($("<th>").text(column.split("_score")[0]));
+        });
+        thead.append(headRow);
+
+        jsonObjects.forEach((obj) => {
+          var row = $("<tr>");
+          columns.forEach((column) => {
+            if (typeof obj[column] === "number") {
+              row.append($("<td>").text(obj[column].toFixed(2)));
+            } else {
+              row.append($("<td>").text(obj[column]));
+            }
+          });
+          tbody.append(row);
+        });
+        var table = $("#jsonlTable").DataTable({
+          columnDefs: [
+            {
+              targets: 1,
+              render: DataTable.render.ellipsis(60),
+            },
+          ],
+        });
+        table.on("click", "tbody tr", function () {
+          let data = table.row(this).data();
+          let rowNum = table.row(this).index();
+          // populate modal with question and answer from the jsonObjects
+          $("#question").text(jsonObjects[rowNum].question);
+          $("#answer").text(jsonObjects[rowNum].answer);
+          $("#truth").text(jsonObjects[rowNum].truth);
+          // show modal
+          const myModal = new bootstrap.Modal(
+            document.getElementById("exampleModal"),
+            {}
+          );
+          myModal.show();
+        });
+      }
+
+      const inputElement = document.getElementById("input");
+      inputElement.addEventListener("change", handleFiles, false);
+      function handleFiles() {
+        const fileList = this.files;
+        const file = fileList[0]; // get the first file from the file list
+
+        if (file) {
+          const reader = new FileReader();
+
+          reader.onload = function (event) {
+            const fileContent = event.target.result;
+            renderTable(fileContent);
+          };
+
+          reader.onerror = function () {
+            console.error("An error occurred while reading the file.");
+          };
+
+          reader.readAsText(file); // read the file as text
+        }
+      }
+    </script>
+  </body>
+</html>

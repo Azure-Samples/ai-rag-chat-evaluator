@@ -50,8 +50,8 @@ class CitationMatchMetric(BaseMetric):
     def get_metric(cls):
         def citation_match(*, data, **kwargs):
             # Return true if all citations in the truth are present in the answer
-            truth_citations = set(re.findall(r"\[[^\]]+\]", data["truth"]))
-            answer_citations = set(re.findall(r"\[[^\]]+\]", data["answer"]))
+            truth_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}\]", data["truth"]))
+            answer_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}\]", data["answer"]))
             citation_match = truth_citations.issubset(answer_citations)
             return {"citation_match": citation_match}
 

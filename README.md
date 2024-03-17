@@ -8,7 +8,7 @@ Whenever you are making changes to a RAG chat with the goal of improving the ans
 This repository offers tools to make it easier to run evaluations, plus examples of evaluations
 that we've run on our [sample chat app](https://github.com/Azure-Samples/azure-search-openai-demo/).
 
-[ 📺 Watch a video overview of this repo](https://www.youtube.com/watch?v=mM8pZAI2C5w)
+[📺 Watch a video overview of this repo](https://www.youtube.com/watch?v=mM8pZAI2C5w)
 
 Table of contents:
 
@@ -70,6 +70,7 @@ If you already have an Azure OpenAI instance, you can use that instead of creati
     AZURE_OPENAI_EVAL_DEPLOYMENT="<deployment-name>"
     AZURE_OPENAI_SERVICE="<service-name>"
     ```
+
 3. The scripts default to keyless access (via `AzureDefaultCredential`), but you can optionally use a key by setting `AZURE_OPENAI_KEY` in `.env`.
 
 ### Using an openai.com instance
@@ -83,7 +84,6 @@ If you have an openai.com instance, you can use that instead of an Azure OpenAI 
     OPENAICOM_KEY=""
     OPENAICOM_ORGANIZATION=""
     ```
-
 
 ## Generating ground truth data
 
@@ -102,6 +102,7 @@ There are a few ways to get this data:
 * Generate more QA pairs than you need, then prune them down manually based on quality and overlap. Remove low quality answers, and remove questions that are too similar to other questions.
 * Be aware of the knowledge distribution in the document set, so you effectively sample questions across the knowledge space.
 * Once your chat application is live, continually sample live user questions (within accordance to your privacy policy) to make sure you're representing the sorts of questions that users are asking.
+
 </details>
 
 ### Running the generator script
@@ -132,7 +133,6 @@ This repo includes a script for generating questions and answers from documents 
     That script will generate 200 questions and answers, and store them in `example_input/qa.jsonl`. We've already provided an example based off the sample documents for this app.
 
     To further customize the generator beyond the `numquestions` and `persource` parameters, modify `scripts/generate.py`.
-
 
 ## Running an evaluation
 
@@ -205,7 +205,8 @@ These metrics are calculated with some local code based on the results of the ch
 
 * `latency`: The time it takes for the chat app to generate an answer, in seconds.
 * `length`: The length of the generated answer, in characters.
-* `answer_has_citation`: Whether the answer contains a correctly formatted citation to a source document, assuming citations are in square brackets.
+* `has_citation`: Whether the answer contains a correctly formatted citation to a source document, assuming citations are in square brackets.
+* `citation_match`: Whether the answer contains at least all of the citations that were in the ground truth answer.
 
 ### Sending additional parameters to the app
 
@@ -238,14 +239,13 @@ That way, you can store potential (long) prompts separately from the config JSON
 The results of each evaluation are stored in a results folder (defaulting to `example_results`).
 Inside each run's folder, you'll find:
 
-- `eval_results.jsonl`: Each question and answer, along with the GPT metrics for each QA pair.
-- `parameters.json`: The parameters used for the run, like the overrides.
-- `summary.json`: The overall results, like the average GPT metrics.
-- `config.json`: The original config used for the run. This is useful for reproducing the run.
+* `eval_results.jsonl`: Each question and answer, along with the GPT metrics for each QA pair.
+* `parameters.json`: The parameters used for the run, like the overrides.
+* `summary.json`: The overall results, like the average GPT metrics.
+* `config.json`: The original config used for the run. This is useful for reproducing the run.
 
 To make it easier to view and compare results across runs, we've built a few tools,
 located inside the `review-tools` folder.
-
 
 ### Using the summary tool
 
@@ -277,6 +277,12 @@ and the GPT metrics below each answer.
 
 Use the buttons at the bottom to navigate to the next question or quit the tool.
 
+You can also filter to only show questions where the value changed for a particular metric, like this:
+
+```bash
+python -m review_tools diff example_results/baseline_1 example_results/baseline_2 --changed=has_citation
+```
+
 ## Measuring app's ability to say "I don't know"
 
 The evaluation flow described above focused on evaluating a model’s answers for a set of questions that *could* be answered by the data. But what about all those questions that can’t be answered by the data? Does your model know how to say “I don’t know?” The GPT models are trained to try and be helpful, so their tendency is to always give some sort of answer, especially for answers that were in their training data. If you want to ensure your app can say “I don’t know” when it should, you need to evaluate it on a different set of questions with a different metric.
@@ -287,15 +293,15 @@ For this evaluation, our ground truth data needs to be a set of question whose a
 
 * **Unknowable**: Questions that are related to the sources but not actually in them (and not public knowledge).
 * **Uncitable**: Questions whose answers are well known to the LLM from its training data, but are not in the sources. There are two flavors of these:
-    * **Related**: Similar topics to sources, so LLM will be particularly tempted to think the sources know.
-    * **Unrelated**: Completely unrelated to sources, so LLM shouldn’t be as tempted to think the sources know.
+  * **Related**: Similar topics to sources, so LLM will be particularly tempted to think the sources know.
+  * **Unrelated**: Completely unrelated to sources, so LLM shouldn’t be as tempted to think the sources know.
 * **Nonsensical**: Questions that are non-questions, that a human would scratch their head at and ask for clarification.
 
 You can write these questions manually, but it’s also possible to generate them using a generator script in this repo,
 assuming you already have ground truth data with answerable questions.
 
 ```shell
-python -m scripts generate_dontknows --input=example_input/qa.jsonl --output=example_input/qa_dontknows.jsonl --numquestions=45
+python -m scripts generate-dontknows --input=example_input/qa.jsonl --output=example_input/qa_dontknows.jsonl --numquestions=45
 ```
 
 That script sends the current questions to the configured GPT-4 model along with prompts to generate questions of each kind.

@@ -10,10 +10,11 @@ from textual.widgets import Button, DataTable, Markdown, Static
 class DiffApp(App):
     CSS_PATH = "diff_app.tcss"
 
-    def __init__(self, directory1: Path, directory2: Path = None):
+    def __init__(self, directory1: Path, directory2: Path = None, changed: str = None):
         super().__init__()
         # Only include the first directory if the second is not provided
         self.directories = [directory1] if directory2 is None else [directory1, directory2]
+        self.changed = changed
         self.data_dicts = []  # Store dicts keyed by question
         self.result_index = 0  # Based on results in the first directory
 
@@ -22,6 +23,12 @@ class DiffApp(App):
             with open(directory / "eval_results.jsonl") as f:
                 data_json = [json.loads(question_json) for question_json in f.readlines()]
                 self.data_dicts.append({question["question"]: question for question in data_json})
+        if self.changed:
+            # filter out questions that have the same value for the given column
+            for question in list(self.data_dicts[0].keys()):
+                if self.data_dicts[0][question].get(self.changed) == self.data_dicts[1][question].get(self.changed):
+                    self.data_dicts[0].pop(question)
+                    self.data_dicts[1].pop(question)
         self.next_question()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -84,6 +91,6 @@ class DiffApp(App):
         self.result_index += 1
 
 
-def main(directory1: Path, directory2: Path):
-    app = DiffApp(directory1, directory2)
+def main(directory1: Path, directory2: Path, changed: str):
+    app = DiffApp(directory1, directory2, changed)
     app.run()

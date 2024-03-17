@@ -1,0 +1,14 @@
+{
+    "testdata_path": "example_input/qa_dontknows.jsonl",
+    "results_dir": "blog_results_dontknows/gpt35_prompt2",
+    "requested_metrics": ["dontknowness", "answer_length", "latency", "has_citation"],
+    "target_url": "http://host.docker.internal:50505/chat",
+    "target_parameters": {
+        "overrides": {
+            "semantic_ranker": false,
+            "top": 3,
+            "search_threshold": 1.5,
+            "prompt_template": "<READFILE>blog_input/prompt_sources2.txt"
+        }
+    }
+}

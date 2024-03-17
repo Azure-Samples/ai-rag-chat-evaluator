@@ -38,7 +38,7 @@ def send_question_to_target(question: str, truth: str, target_url: str, paramete
                 f"to match the actual schema.\nResponse: {response_dict}"
             )
 
-        response_obj = {"question": question, "answer": answer, "context": context, "latency": latency}
+        response_obj = {"question": question, "truth": truth, "answer": answer, "context": context, "latency": latency}
         return response_obj
     except Exception as e:
         if raise_error:
