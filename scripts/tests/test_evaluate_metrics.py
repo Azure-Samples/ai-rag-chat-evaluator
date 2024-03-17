@@ -41,6 +41,14 @@ def test_citation_match():
     assert metric.get_aggregate_stats(df) == {"total": 2, "rate": 0.67}
 
 
+def test_citation_match_filenames_only():
+    truth = 'Use settings like "python.linting.enabled": true, "[python]" [best-practices-for-prompting-github.html]'
+    answer = 'Use extension with setting "python.linting.enabled" [best-practices-for-prompting-github.html]'
+    metric = code_metrics.CitationMatchMetric()
+    metric_function = metric.get_metric()
+    assert metric_function(data={"truth": truth, "answer": answer}) == {"citation_match": True}
+
+
 def test_latency():
     metric = code_metrics.LatencyMetric()
     metric_function = metric.get_metric()
