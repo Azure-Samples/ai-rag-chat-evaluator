@@ -6,8 +6,6 @@
     "target_parameters": {
         "overrides": {
             "semantic_ranker": false,
-            "top": 3,
-            "search_threshold": 1.5,
             "prompt_template": "<READFILE>blog_input/prompt_sources2.txt"
         }
     }
