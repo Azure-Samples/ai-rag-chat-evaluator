@@ -47,13 +47,13 @@ We've made that easy to deploy with the `azd` CLI tool.
 3. Run `azd up` to deploy a new GPT-4 instance
 4. Create a `.env` file based on the provisioned resources by running one of the following commands.
 
-    Powershell:
+    Bash:
 
     ```shell
     azd env get-values > .env
     ```
 
-    Bash:
+    PowerShell:
 
     ```powershell
     $output = azd env get-values; Add-Content -Path .env -Value $output;
