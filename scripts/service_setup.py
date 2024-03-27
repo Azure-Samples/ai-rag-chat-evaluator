@@ -33,6 +33,7 @@ def get_openai_config():
             "api_key": os.environ["OPENAICOM_KEY"],
             "organization": os.environ["OPENAICOM_ORGANIZATION"],
             "model": os.environ["OPENAI_GPT_MODEL"],
+            "deployment_id": "none-needed-for-openaicom",
         }
     return openai_config
 
@@ -62,8 +63,4 @@ def get_openai_client(oai_config: dict):
             azure_deployment=oai_config["deployment_id"],
         )
     else:
-        return openai.OpenAI(
-            api_key=oai_config["api_key"],
-            organization=oai_config["organization"],
-            model=oai_config["model"],
-        )
+        return openai.OpenAI(api_key=oai_config["api_key"], organization=oai_config["organization"])
