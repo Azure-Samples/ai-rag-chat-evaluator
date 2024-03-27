@@ -12,7 +12,7 @@ app = typer.Typer(pretty_exceptions_enable=False)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s (%(levelname)s) %(name)s: %(message)s", datefmt="%H:%M:%S")
 
-dotenv.load_dotenv()
+dotenv.load_dotenv(override=True)
 
 
 def int_or_none(raw: str) -> int | None:
