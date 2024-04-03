@@ -1,6 +1,7 @@
 requests
 python-dotenv
 azure-ai-generative[evaluate]==1.0.0b7
+promptflow==1.6.0
 azure-search-documents
 typer
 openai>=1.0.0
