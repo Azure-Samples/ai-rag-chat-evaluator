@@ -3,6 +3,7 @@ from pathlib import Path
 
 import dotenv
 import typer
+from rich.logging import RichHandler
 
 from . import service_setup
 from .evaluate import run_evaluate_from_config
@@ -10,7 +11,13 @@ from .generate import generate_dontknows_qa_data, generate_test_qa_data
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
-logging.basicConfig(level=logging.INFO, format="%(asctime)s (%(levelname)s) %(name)s: %(message)s", datefmt="%H:%M:%S")
+logging.basicConfig(
+    level=logging.WARNING, format="%(message)s", datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
+)
+logger = logging.getLogger("scripts")
+# We only set the level to INFO for our logger,
+# to avoid seeing the noisy INFO level logs from the Azure SDKs
+logger.setLevel(logging.INFO)
 
 dotenv.load_dotenv(override=True)
 

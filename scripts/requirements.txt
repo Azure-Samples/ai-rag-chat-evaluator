@@ -6,3 +6,4 @@ azure-search-documents
 typer
 openai>=1.0.0
 pandas
+rich
