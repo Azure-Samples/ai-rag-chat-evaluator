@@ -190,7 +190,7 @@ def process_config(obj: dict):
                     obj[key] = f.read()
 
 
-def run_evaluate_from_config(working_dir, config_path, num_questions):
+def run_evaluate_from_config(working_dir, config_path, num_questions, target_url):
     config_path = working_dir / Path(config_path)
     logger.info("Running evaluation from config %s", config_path)
     with open(config_path, encoding="utf-8") as f:
@@ -203,7 +203,7 @@ def run_evaluate_from_config(working_dir, config_path, num_questions):
         openai_config=service_setup.get_openai_config(),
         testdata_path=working_dir / config["testdata_path"],
         results_dir=results_dir,
-        target_url=config["target_url"],
+        target_url=target_url or config["target_url"],
         target_parameters=config.get("target_parameters", {}),
         num_questions=num_questions,
         requested_metrics=config.get(

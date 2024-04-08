@@ -75,3 +75,11 @@ jobs:
           AZURE_ENV_NAME: ${{ vars.AZURE_ENV_NAME }}
           AZURE_LOCATION: ${{ vars.AZURE_LOCATION }}
           AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Run evaluation
+        run: |
+          azd env get-values > .env
+          source .env
+          python -m scripts evaluate --config=example_config.json --numquestions=2 --targeturl=${{ env.TARGET_URL }}
+        env:
+          TARGET_ENDPOINT: ${{ vars.TARGET_ENDPOINT }}

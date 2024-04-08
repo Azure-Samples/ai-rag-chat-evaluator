@@ -26,6 +26,10 @@ def int_or_none(raw: str) -> int | None:
     return None if raw == "None" else int(raw)
 
 
+def str_or_none(raw: str) -> str | None:
+    return None if raw == "None" else raw
+
+
 @app.command()
 def evaluate(
     config: Path = typer.Option(
@@ -34,8 +38,13 @@ def evaluate(
     numquestions: int | None = typer.Option(
         help="Number of questions to evaluate (defaults to all if not specified).", default=None, parser=int_or_none
     ),
+    targeturl: str | None = typer.Option(
+        help="URL of the target service to evaluate against (defaults to the one in the config).",
+        default=None,
+        parser=str_or_none,
+    ),
 ):
-    run_evaluate_from_config(Path.cwd(), config, numquestions)
+    run_evaluate_from_config(Path.cwd(), config, numquestions, targeturl)
 
 
 @app.command()
