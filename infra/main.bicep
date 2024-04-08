@@ -35,6 +35,9 @@ param evalGptDeploymentCapacity int = 30
 @description('Id of the user or app to assign application roles')
 param principalId string = ''
 
+@description('Whether the deployment is running on GitHub Actions')
+param runningOnGh string = ''
+
 var resourceToken = toLower(uniqueString(subscription().id, environmentName, location))
 var prefix = '${environmentName}${resourceToken}'
 var tags = { 'azd-env-name': environmentName }
@@ -77,13 +80,15 @@ module openAi 'core/ai/cognitiveservices.bicep' = if (openAiHost == 'azure') {
 
 
 // USER ROLES
+var principalType = empty(runningOnGh) ? 'User' : 'ServicePrincipal'
+
 module openAiRoleUser 'core/security/role.bicep' = if (openAiHost == 'azure') {
   scope: openAiResourceGroup
   name: 'openai-role-user'
   params: {
     principalId: principalId
     roleDefinitionId: '5e0bd9bd-7b93-4f28-af87-19fc36ad61bd'
-    principalType: 'User'
+    principalType: principalType
   }
 }
 

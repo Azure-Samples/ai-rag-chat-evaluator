@@ -21,10 +21,17 @@ jobs:
     if: github.repository == 'Azure-samples/ai-rag-chat-evaluator'
     runs-on: ubuntu-latest
     env:
+      # azd required
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
       AZURE_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
       AZURE_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      # project specific
+      OPENAI_HOST: ${{ vars.OPENAI_HOST }}
+      AZURE_OPENAI_SERVICE: ${{ vars.AZURE_OPENAI_SERVICE }}
+      AZURE_OPENAI_RESOURCE_GROUP: ${{ vars.AZURE_OPENAI_RESOURCE_GROUP }}
+      OPENAI_ORGANIZATION: ${{ vars.OPENAI_ORGANIZATION }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
