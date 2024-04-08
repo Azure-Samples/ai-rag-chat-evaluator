@@ -3,3 +3,11 @@
 name: ai-rag-chat-evaluator
 metadata:
   template: ai-rag-chat-evaluator@0.0.2
+pipeline:
+  variables:
+    - OPENAI_HOST
+    - AZURE_OPENAI_SERVICE
+    - AZURE_OPENAI_RESOURCE_GROUP
+    - OPENAI_ORGANIZATION
+  secrets:
+    - OPENAI_API_KEY

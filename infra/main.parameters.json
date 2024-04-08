@@ -28,6 +28,9 @@
     },
     "openAiApiOrganization": {
       "value": "${OPENAI_ORGANIZATION}"
+    },
+    "runningOnGh": {
+      "value": "${GITHUB_ACTIONS}"
     }
   }
 }
