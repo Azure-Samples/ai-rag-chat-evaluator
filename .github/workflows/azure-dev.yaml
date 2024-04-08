@@ -93,4 +93,4 @@ jobs:
           source .env
           python -m scripts evaluate --config=example_config.json --numquestions=2 --targeturl=${{ env.TARGET_URL }}
         env:
-          TARGET_ENDPOINT: ${{ vars.TARGET_ENDPOINT }}
+          TARGET_URL: ${{ secrets.TARGET_URL }}
