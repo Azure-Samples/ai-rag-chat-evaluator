@@ -1,3 +1,4 @@
+name: Deploy GPT-4 with azd
 on:
   workflow_dispatch:
   push:
