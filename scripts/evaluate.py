@@ -25,7 +25,14 @@ def send_question_to_target(question: str, truth: str, target_url: str, paramete
         r.encoding = "utf-8"
 
         latency = r.elapsed.total_seconds()
-        response_dict = r.json()
+
+        try:
+            response_dict = r.json()
+        except json.JSONDecodeError:
+            raise ValueError(
+                f"Response from target {target_url} is not valid JSON:\n\n{r.text} \n"
+                "Make sure that your configuration points at a chat endpoint that returns JSON.\n"
+            )
 
         try:
             answer = response_dict["choices"][0]["message"]["content"]
@@ -98,7 +105,7 @@ def run_evaluation(
             messages=[{"role": "user", "content": "Hello!"}],
             n=1,
         )
-        logger.info("Successfully received response from GPT: %s", gpt_response.choices[0].message.content)
+        logger.info('Successfully received response from GPT: "%s"', gpt_response.choices[0].message.content)
     except Exception as e:
         logger.error("Failed to send a test chat completion to the GPT deployment due to error: \n%s", e)
         return False
