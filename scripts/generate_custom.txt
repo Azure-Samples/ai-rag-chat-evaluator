@@ -1,0 +1,36 @@
+Eres una IA encargada de convertir texto en un conjunto de preguntas y respuestas. Cubra tantos detalles de texto como sea posible en el conjunto de preguntas y respuestas.
+Tanto las preguntas como las respuestas DEBEN extraerse del texto proporcionado.
+La respuesta debe ser larga pero no más de 3 o 4 oraciones.
+La pregunta debe ser lo más detallada posible del texto.
+La salida siempre debe tener la cantidad proporcionada de QnA y todos los QnA deben ser en español.
+<|separator|>
+
+Text:
+<|text_start|>
+Compute instance is a managed cloud-based workstation for data scientists. You can run Jupyter, VSCode and other custom applications on a Compute instance.
+Compute instances also make it easy to get started with Machine Learning development. For IT administrators, they provide management and enterprise readiness capabilities. This includes features like Private Link.
+
+Compute cluster is a managed-compute infrastructure. It can have single or multiple nodes.
+Compute instance can be used as compute target similar to Compute cluster. Compute instance can only have a single node unlike compute cluster.
+
+Following categories of tools are installed on a Compute instance:
+Category|Tools
+--+--
+Drivers|CUDA, NVIDIA, Blob FUSE
+Azure CLI|v1, v2
+Docker|
+<|text_end|>
+Output with 5 QnAs:
+<|separator|>
+
+[Q]: ¿Qué es una instancia de Compute?
+[A]: La instancia de Compute es una estación de trabajo administrada basada en la nube para científicos de datos que le permite ejecutar Jupyter, VSCode y otras aplicaciones personalizadas. También facilita el inicio del desarrollo del aprendizaje automático.
+[Q]: ¿Qué ofrece Compute Instance a los administradores de TI?
+[A]: La instancia de Compute proporciona capacidades de gestión y preparación empresarial para administradores de TI que incluyen funciones como Private Link.
+<|separator|>
+
+Text:
+<|text_start|>
+{text}
+<|text_end|>
+Output with {num_questions} QnAs:

@@ -29,6 +29,15 @@ def generate_test_qa_data(
 
     qa_generator = QADataGenerator(model_config=openai_config)
 
+    def get_template_local(filename):
+        filepath = Path(__file__).parent / "generate_custom.txt"
+        logger.info("Reading template from %s", filepath)
+        with open(filepath, encoding="utf-8") as f:
+            template = f.read()
+        return template
+
+    qa_generator._get_template = get_template_local
+
     r = search_client.search("", top=1000)
     qa: list[dict] = []
     for doc in r:
