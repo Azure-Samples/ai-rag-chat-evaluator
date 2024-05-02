@@ -75,6 +75,7 @@ module openAi 'core/ai/cognitiveservices.bicep' = if (openAiHost == 'azure') {
         capacity: evalGptDeploymentCapacity
       }
     }]
+    disableLocalAuth: true
   }
 }
 
