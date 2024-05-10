@@ -148,23 +148,27 @@ The config.json should contain these fields as a minimum:
 ```json
 {
     "testdata_path": "example_input/qa.jsonl",
-    "target_url": "http://localhost:50505/chat",
+    "target_url": "http://localhost:50505/api/chat",
     "requested_metrics": ["groundedness", "relevance", "coherence", "latency", "answer_length"],
     "results_dir": "example_results/experiment<TIMESTAMP>"
 }
 ```
 
+> [!IMPORTANT]
+> To work properly with the ***PILOT-2 backend*** the `X_API_KEY` environment variable shoud be set. Please, contact [Roman Babkin](
+roman.babkin@globallogic.com) <roman.babkin@globallogic.com> to get the valid authentification key.
+
 ### Running against a local container
 
 If you're running this evaluator in a container and your app is running in a container on the same system, use a URL like this for the `target_url`:
 
-"target_url": "http://host.docker.internal:50505/chat"
+"target_url": "http://host.docker.internal:50505/api/chat"
 
 ### Running against a deployed app
 
 To run against a deployed endpoint, change the `target_url` to the chat endpoint of the deployed app:
 
-"target_url": "https://app-backend-j25rgqsibtmlo.azurewebsites.net/chat"
+"target_url": "https://app-backend-j25rgqsibtmlo.azurewebsites.net/api/chat"
 
 ### Running on a subset of questions
 

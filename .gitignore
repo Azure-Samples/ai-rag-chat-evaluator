@@ -150,3 +150,6 @@ static/
 mlruns/
 
 .DS_Store
+
+results*
+inputs*

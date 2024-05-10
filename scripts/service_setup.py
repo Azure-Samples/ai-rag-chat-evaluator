@@ -22,7 +22,7 @@ def get_openai_config():
             "api_type": "azure",
             "api_base": f"https://{os.environ['AZURE_OPENAI_SERVICE']}.openai.azure.com",
             "api_key": api_key,
-            "api_version": "2023-07-01-preview",
+            "api_version": os.getenv("AZURE_OPENAI_API_VERSION", "2023-07-01-preview"),
             "deployment_id": os.environ["AZURE_OPENAI_EVAL_DEPLOYMENT"],
             "model": os.environ["OPENAI_GPT_MODEL"],
         }
@@ -35,6 +35,8 @@ def get_openai_config():
             "model": os.environ["OPENAI_GPT_MODEL"],
             "deployment_id": "none-needed-for-openaicom",
         }
+    if x_api_key := os.getenv('X_API_KEY'):
+        openai_config["x_api_key"] = x_api_key
     return openai_config
 
 

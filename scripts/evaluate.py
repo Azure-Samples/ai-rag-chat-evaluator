@@ -13,8 +13,17 @@ from .evaluate_metrics import metrics_by_name
 logger = logging.getLogger("scripts")
 
 
-def send_question_to_target(question: str, truth: str, target_url: str, parameters: dict = {}, raise_error=False):
+def send_question_to_target(
+        question: str,
+        truth: str,
+        target_url: str,
+        parameters: dict = {},
+        raise_error=False,
+        x_api_key: str | None = None,
+):
     headers = {"Content-Type": "application/json"}
+    if x_api_key:
+        headers["X-Api-Key"] = x_api_key
     body = {
         "messages": [{"content": question, "role": "user"}],
         "stream": False,
@@ -86,7 +95,12 @@ def run_evaluation(
     logger.info("Sending a test question to the target to ensure it is running...")
     try:
         target_data = send_question_to_target(
-            "What information is in your knowledge base?", "So much", target_url, target_parameters, raise_error=True
+            "What information is in your knowledge base?",
+            "So much",
+            target_url,
+            target_parameters,
+            raise_error=True,
+            x_api_key=openai_config.get('x_api_key'),
         )
         logger.info(
             'Successfully received response from target: "question": "%s", "answer": "%s", "context": "%s"',
@@ -112,7 +126,13 @@ def run_evaluation(
 
     # Wrap the target function so that it can be called with a single argument
     async def wrap_target(question: str, truth: str):
-        return send_question_to_target(question, truth, target_url, target_parameters)
+        return send_question_to_target(
+            question,
+            truth,
+            target_url,
+            target_parameters,
+            x_api_key=openai_config.get('x_api_key')
+        )
 
     logger.info("Starting evaluation...")
     for metric in requested_metrics:
