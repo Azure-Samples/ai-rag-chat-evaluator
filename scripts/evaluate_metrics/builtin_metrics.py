@@ -25,3 +25,33 @@ class BuiltinCoherenceMetric(BuiltinRatingMetric):
 class BuiltinGroundednessMetric(BuiltinRatingMetric):
 
     METRIC_NAME = "gpt_groundedness"
+
+
+class BuiltinFluencyMetric(BuiltinRatingMetric):
+
+    METRIC_NAME = "gpt_fluency"
+
+
+class BuiltinSimilarityMetric(BuiltinRatingMetric):
+
+    METRIC_NAME = "gpt_similarity"
+
+
+class BuiltinHateUnfairnessyMetric(BuiltinRatingMetric):
+
+    METRIC_NAME = "hate_unfairness"
+
+
+class BuiltinSexualMetric(BuiltinRatingMetric):
+
+    METRIC_NAME = "sexual"
+
+
+class BuiltinViolenceMetric(BuiltinRatingMetric):
+
+    METRIC_NAME = "violence"
+
+
+class BuiltinSelfHarmMetric(BuiltinRatingMetric):
+
+    METRIC_NAME = "self_harm"

@@ -1,0 +1,44 @@
+System:
+You are an AI assistant. Your task is to assess the contextual relevance of the provided context for a question-answering task.
+
+User:
+Contextual Relevance measures how focused and relevant the provided context is to the question, ensuring it contains minimal irrelevant information. Evaluate the contextual relevance on a scale from one to five stars using the criteria below:
+One star: the context is completely irrelevant to the question
+Two stars: the context contains mostly irrelevant information
+Three stars: the context is partially relevant but includes significant irrelevant details
+Four stars: the context is mostly relevant with some irrelevant details
+Five stars: the context is perfectly relevant and focused, containing only necessary information
+
+This rating should always be an integer between 1 and 5, thus the produced rating must be 1, 2, 3, 4, or 5.
+
+context: Nikola Tesla was a Serbian-American inventor, electrical engineer, mechanical engineer, and futurist best known for his contributions to the design of the modern alternating current (AC) electricity supply system.
+question: What are the health benefits of the Mediterranean diet?
+stars: 1
+
+context: The Mediterranean diet is a commonly recommended dietary plan that emphasizes fruits, vegetables, whole grains, legumes, lean proteins, and healthy fats. Studies have shown that it offers numerous health benefits, including a reduced risk of heart disease and improved cognitive health.
+question: What are the health benefits of the Mediterranean diet?
+stars: 5
+
+context: The Great Wall of China is a series of fortifications made of stone, brick, tamped earth, wood, and other materials, generally built along an east-to-west line across the historical northern borders of China to protect the Chinese states and empires against the raids and invasions of the various nomadic groups of the Eurasian Steppe.
+question: What are the health benefits of the Mediterranean diet?
+stars: 1
+
+context: The Mediterranean diet involves a daily intake of vegetables, fruits, whole grains, and healthy fats; weekly intake of fish, poultry, beans, and eggs; moderate portions of dairy products; and limited intake of red meat.
+question: What are the main components of the Mediterranean diet?
+stars: 5
+
+context: Leonardo da Vinci was a renowned Italian artist, scientist, and polymath of the Renaissance period, known for his contributions to various fields including art, science, engineering, anatomy, and many more. His work has left a lasting impact on the world.
+question: Who painted the Mona Lisa?
+stars: 4
+
+context: Leonardo da Vinci was a renowned Italian artist, scientist, and polymath of the Renaissance period, known for his contributions to various fields including art, science, engineering, anatomy, and many more. His work has left a lasting impact on the world.
+question: Who painted the Mona Lisa?
+stars: 4
+
+context: {{context}}
+question: {{question}}
+stars:
+
+Your response must include the following fields and should be in json format:
+score: Number of stars based on the definition above
+reason: Reason why the score was given

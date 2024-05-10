@@ -15,7 +15,7 @@ class CustomRatingMetric(BaseMetric):
 
     @classmethod
     def get_aggregate_stats(cls, df):
-        return cls.get_aggregate_stats_for_numeric_rating(df, f"{cls.METRIC_NAME}_score")
+        return cls.get_aggregate_stats_for_numeric_rating(df, f"{cls.METRIC_NAME}")
 
 
 class RelevanceMetric(CustomRatingMetric):
@@ -36,3 +36,18 @@ class GroundednessMetric(CustomRatingMetric):
 class DontKnownessMetric(CustomRatingMetric):
 
     METRIC_NAME = "dontknowness"
+
+
+class FaithfullnessMetric(CustomRatingMetric):
+
+    METRIC_NAME = "faithfullness"
+
+
+class AnswerRelevanceMetric(CustomRatingMetric):
+
+    METRIC_NAME = "answer_relevance"
+
+
+class ContextRelevanceMetric(CustomRatingMetric):
+
+    METRIC_NAME = "context_relevance"
