@@ -16,8 +16,7 @@ def test_send_question_to_target_valid():
         ]
     }
     requests.post = lambda url, headers, json: MockResponse(response)
-    result = send_question_to_target("Question 1", "Answer 1", "http://example.com")
-    assert result["question"] == "Question 1"
+    result = send_question_to_target("Question 1", "http://example.com")
     assert result["answer"] == "This is the answer"
     assert result["context"] == "Context 1\n\nContext 2"
     assert result["latency"] == 1
@@ -27,8 +26,7 @@ def test_send_question_to_target_missing_error_store():
     # Test case 2: Missing 'choices' key in response
     response = {}
     requests.post = lambda url, headers, json: MockResponse(response)
-    result = send_question_to_target("Question", "Answer", "http://example.com")
-    assert result["question"] == "Question"
+    result = send_question_to_target("Question", "http://example.com")
     assert result["answer"] == (
         "Response does not adhere to the expected schema. "
         "Either adjust the app response or adjust send_question_to_target() "

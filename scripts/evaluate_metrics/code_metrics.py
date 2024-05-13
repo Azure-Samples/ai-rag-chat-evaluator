@@ -8,9 +8,9 @@ class AnswerLengthMetric(BaseMetric):
     METRIC_NAME = "answer_length"
 
     @classmethod
-    def get_metric(cls):
-        def answer_length(*, data, **kwargs):
-            return {AnswerLengthMetric.METRIC_NAME: len(data["answer"])}
+    def evaluator_fn(cls, **kwargs):
+        def answer_length(*, answer, **kwargs):
+            return {AnswerLengthMetric.METRIC_NAME: len(answer)}
 
         return answer_length
 
@@ -28,9 +28,9 @@ class HasCitationMetric(BaseMetric):
     METRIC_NAME = "has_citation"
 
     @classmethod
-    def get_metric(cls):
-        def has_citation(*, data, **kwargs):
-            return {"has_citation": bool(re.search(r"\[[^\]]+\]", data["answer"]))}
+    def evaluator_fn(cls, **kwargs):
+        def has_citation(*, answer, **kwargs):
+            return {"has_citation": bool(re.search(r"\[[^\]]+\]", answer))}
 
         return has_citation
 
@@ -47,11 +47,11 @@ class CitationMatchMetric(BaseMetric):
     METRIC_NAME = "citation_match"
 
     @classmethod
-    def get_metric(cls):
-        def citation_match(*, data, **kwargs):
+    def evaluator_fn(cls, **kwargs):
+        def citation_match(*, answer, ground_truth, **kwargs):
             # Return true if all citations in the truth are present in the answer
-            truth_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}\]", data["truth"]))
-            answer_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}\]", data["answer"]))
+            truth_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}\]", ground_truth))
+            answer_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}\]", answer))
             citation_match = truth_citations.issubset(answer_citations)
             return {"citation_match": citation_match}
 
@@ -70,8 +70,8 @@ class LatencyMetric(BaseMetric):
     METRIC_NAME = "latency"
 
     @classmethod
-    def get_metric(cls):
-        def latency(*, data, **kwargs):
+    def evaluator_fn(cls, **kwargs):
+        def latency(**kwargs):
             # Return no additional data, since latency is already stored in the target response
             return {}
 

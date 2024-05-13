@@ -5,8 +5,7 @@
     "target_url": "http://host.docker.internal:50505/chat",
     "target_parameters": {
         "overrides": {
-            "semantic_ranker": false,
-            "prompt_template": "<READFILE>blog_input/prompt_sources2.txt"
+            "prompt_template": "<READFILE>example_input/prompt_refined.txt"
         }
     }
 }

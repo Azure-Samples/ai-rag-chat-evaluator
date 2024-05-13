@@ -150,3 +150,8 @@ static/
 mlruns/
 
 .DS_Store
+
+# Additional test directories used by maintainer
+pamelas_blog_input/
+pamelas_blog_results/
+pamelas_blog_results_dontknows/
