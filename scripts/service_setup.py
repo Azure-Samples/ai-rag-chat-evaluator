@@ -3,7 +3,7 @@ import os
 
 import openai
 from azure.core.credentials import AzureKeyCredential
-from azure.identity import AzureDeveloperCliCredential
+from azure.identity import AzureDeveloperCliCredential, get_bearer_token_provider
 from azure.search.documents import SearchClient
 from promptflow.core import AzureOpenAIModelConfiguration, ModelConfiguration, OpenAIModelConfiguration
 
@@ -90,11 +90,16 @@ def get_search_client():
 
 def get_openai_client(oai_config: ModelConfiguration):
     if isinstance(oai_config, AzureOpenAIModelConfiguration):
+        azure_token_provider = None
+        if not os.environ.get("AZURE_OPENAI_KEY"):
+            azure_token_provider = get_bearer_token_provider(
+                AzureDeveloperCliCredential(), "https://cognitiveservices.azure.com/.default"
+            )
         return openai.AzureOpenAI(
             api_version=oai_config.api_version,
             azure_endpoint=oai_config.azure_endpoint,
             api_key=oai_config.api_key if os.environ.get("AZURE_OPENAI_KEY") else None,
-            azure_ad_token_provider=None if os.environ.get("AZURE_OPENAI_KEY") else oai_config.azure_ad_token_provider,
+            azure_ad_token_provider=azure_token_provider,
             azure_deployment=oai_config.azure_deployment,
         )
     elif isinstance(oai_config, OpenAIModelConfiguration):

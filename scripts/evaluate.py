@@ -6,8 +6,8 @@ from pathlib import Path
 import pandas as pd
 import requests
 
-from scripts import service_setup
-from scripts.evaluate_metrics import metrics_by_name
+from . import service_setup
+from .evaluate_metrics import metrics_by_name
 
 logger = logging.getLogger("scripts")
 
@@ -56,7 +56,7 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
         }
 
 
-def truncate_for_log(s: str, max_length=30):
+def truncate_for_log(s: str, max_length=50):
     return s if len(s) < max_length else s[:max_length] + "..."
 
 
@@ -80,37 +80,36 @@ def run_evaluation(
         logger.info("Limiting evaluation to %s questions", num_questions)
         testdata = testdata[:num_questions]
 
-    if False:
-        logger.info("Sending a test question to the target to ensure it is running...")
-        try:
-            target_data = send_question_to_target(
-                "What information is in your knowledge base?",
-                "So much",
-                target_url,
-                target_parameters,
-                raise_error=True,
-            )
-            logger.info(
-                'Successfully received response from target: "question": "%s", "answer": "%s", "context": "%s"',
-                truncate_for_log(target_data["question"]),
-                truncate_for_log(target_data["answer"]),
-                truncate_for_log(target_data["context"]),
-            )
-        except Exception as e:
-            logger.error("Failed to send a test question to the target due to error: \n%s", e)
-            return False
+    logger.info("Sending a test question to the target to ensure it is running...")
+    try:
+        question = "What information is in your knowledge base?"
+        target_data = send_question_to_target(
+            question,
+            target_url,
+            target_parameters,
+            raise_error=True,
+        )
+        logger.info(
+            'Successfully received response from target for question: "%s"\n"answer": "%s"\n"context": "%s"',
+            truncate_for_log(question),
+            truncate_for_log(target_data["answer"]),
+            truncate_for_log(target_data["context"]),
+        )
+    except Exception as e:
+        logger.error("Failed to send a test question to the target due to error: \n%s", e)
+        return False
 
-        logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
-        try:
-            gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
-                model=openai_config.model,
-                messages=[{"role": "user", "content": "Hello!"}],
-                n=1,
-            )
-            logger.info('Successfully received response from GPT: "%s"', gpt_response.choices[0].message.content)
-        except Exception as e:
-            logger.error("Failed to send a test chat completion to the GPT deployment due to error: \n%s", e)
-            return False
+    logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
+    try:
+        gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
+            model=openai_config.model,
+            messages=[{"role": "user", "content": "Hello!"}],
+            n=1,
+        )
+        logger.info('Successfully received response from GPT: "%s"', gpt_response.choices[0].message.content)
+    except Exception as e:
+        logger.error("Failed to send a test chat completion to the GPT deployment due to error: \n%s", e)
+        return False
 
     logger.info("Starting evaluation...")
     for metric in requested_metrics:

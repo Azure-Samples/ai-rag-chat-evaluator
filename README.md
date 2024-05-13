@@ -201,7 +201,7 @@ The following metrics are implemented very similar to the built-in metrics, but 
 
 * `mycoherence`: Measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language. Based on `scripts/evaluate_metrics/prompts/coherence.prompty`.
 * `myrelevance`: Assesses the ability of answers to capture the key points of the context. Based on `scripts/evaluate_metrics/prompts/relevance.prompty`.
-* `mygroundedness`: Assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context. Based on `scripts/evaluate_metrics/prompts/groundedness.jinja2`.
+* `mygroundedness`: Assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context. Based on `scripts/evaluate_metrics/prompts/groundedness.prompty`.
 
 ##### Code metrics
 
