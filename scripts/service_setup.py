@@ -29,7 +29,7 @@ def get_openai_config() -> ModelConfiguration:
                 azure_endpoint=azure_endpoint, azure_deployment=azure_deployment, api_version=api_version
             )
             # PromptFlow will call DefaultAzureCredential behind the scenes
-        openai_config.model = os.environ["AZURE_OPENAI_EVALGPT_MODEL"]
+        openai_config.model = os.environ["OPENAI_GPT_MODEL"]
     else:
         logger.info("Using OpenAI Service with API Key from OPENAICOM_KEY")
         openai_config = OpenAIModelConfiguration(
