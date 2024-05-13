@@ -151,7 +151,7 @@ mlruns/
 
 .DS_Store
 
-blog_input/
-blog_results/
-blog_results_dontknows/
-blog_results_offtopic/
+# Additional test directories used by maintainer
+pamelas_blog_input/
+pamelas_blog_results/
+pamelas_blog_results_dontknows/
