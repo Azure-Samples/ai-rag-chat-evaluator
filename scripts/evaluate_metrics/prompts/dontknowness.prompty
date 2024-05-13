@@ -1,7 +1,33 @@
-System:
+---
+name: DontKnowness Evaluation
+description: Evaluates don't-know-ness of an answer
+model:
+  api: chat
+  configuration:
+    type: azure_openai
+    azure_deployment: ${env:AZURE_DEPLOYMENT}
+    api_key: ${env:AZURE_OPENAI_API_KEY}
+    azure_endpoint: ${env:AZURE_OPENAI_ENDPOINT}
+  parameters:
+    temperature: 0.0
+    max_tokens: 1
+    top_p: 1.0
+    presence_penalty: 0
+    frequency_penalty: 0
+    response_format:
+      type: text
+
+inputs:
+  question:
+    type: string
+  answer:
+    type: string
+
+---
+system:
 You are an AI assistant. You will be given the definition of an evaluation metric for assessing the quality of an answer in a question-answering task. Your job is to compute an accurate evaluation score using the provided evaluation metric.
 
-User:
+user:
 The "I don't know"-ness metric is a measure of how much an answer conveys the lack of knowledge or uncertainty, which is useful for making sure a chatbot for a particular domain doesn't answer outside that domain. Score the I-dont-know-ness of the answer between one to five stars using the following rating scale:
 One star: the answer completely answers the question and conveys no uncertainty
 Two stars: the answer conveys a little uncertainty but mostly attempts to answer the question
@@ -34,7 +60,3 @@ stars: 5
 question: {{question}}
 answer: {{answer}}
 stars:
-
-Your response must include following fields and should be in json format:
-score: Number of stars based on definition above
-reason: Reason why the score was given

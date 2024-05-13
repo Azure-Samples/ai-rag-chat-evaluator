@@ -5,15 +5,14 @@ from pathlib import Path
 
 import pandas as pd
 import requests
-from azure.ai.generative.evaluate import evaluate
 
-from . import service_setup
-from .evaluate_metrics import metrics_by_name
+from scripts import service_setup
+from scripts.evaluate_metrics import metrics_by_name
 
 logger = logging.getLogger("scripts")
 
 
-def send_question_to_target(question: str, truth: str, target_url: str, parameters: dict = {}, raise_error=False):
+def send_question_to_target(question: str, target_url: str, parameters: dict = {}, raise_error=False):
     headers = {"Content-Type": "application/json"}
     body = {
         "messages": [{"content": question, "role": "user"}],
@@ -45,14 +44,12 @@ def send_question_to_target(question: str, truth: str, target_url: str, paramete
                 f"to match the actual schema.\nResponse: {response_dict}"
             )
 
-        response_obj = {"question": question, "truth": truth, "answer": answer, "context": context, "latency": latency}
+        response_obj = {"answer": answer, "context": context, "latency": latency}
         return response_obj
     except Exception as e:
         if raise_error:
             raise e
         return {
-            "question": question,
-            "truth": truth,
             "answer": str(e),
             "context": str(e),
             "latency": -1,
@@ -83,36 +80,37 @@ def run_evaluation(
         logger.info("Limiting evaluation to %s questions", num_questions)
         testdata = testdata[:num_questions]
 
-    logger.info("Sending a test question to the target to ensure it is running...")
-    try:
-        target_data = send_question_to_target(
-            "What information is in your knowledge base?", "So much", target_url, target_parameters, raise_error=True
-        )
-        logger.info(
-            'Successfully received response from target: "question": "%s", "answer": "%s", "context": "%s"',
-            truncate_for_log(target_data["question"]),
-            truncate_for_log(target_data["answer"]),
-            truncate_for_log(target_data["context"]),
-        )
-    except Exception as e:
-        logger.error("Failed to send a test question to the target due to error: \n%s", e)
-        return False
+    if False:
+        logger.info("Sending a test question to the target to ensure it is running...")
+        try:
+            target_data = send_question_to_target(
+                "What information is in your knowledge base?",
+                "So much",
+                target_url,
+                target_parameters,
+                raise_error=True,
+            )
+            logger.info(
+                'Successfully received response from target: "question": "%s", "answer": "%s", "context": "%s"',
+                truncate_for_log(target_data["question"]),
+                truncate_for_log(target_data["answer"]),
+                truncate_for_log(target_data["context"]),
+            )
+        except Exception as e:
+            logger.error("Failed to send a test question to the target due to error: \n%s", e)
+            return False
 
-    logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
-    try:
-        gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
-            model=openai_config["model"],
-            messages=[{"role": "user", "content": "Hello!"}],
-            n=1,
-        )
-        logger.info('Successfully received response from GPT: "%s"', gpt_response.choices[0].message.content)
-    except Exception as e:
-        logger.error("Failed to send a test chat completion to the GPT deployment due to error: \n%s", e)
-        return False
-
-    # Wrap the target function so that it can be called with a single argument
-    async def wrap_target(question: str, truth: str):
-        return send_question_to_target(question, truth, target_url, target_parameters)
+        logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
+        try:
+            gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
+                model=openai_config.model,
+                messages=[{"role": "user", "content": "Hello!"}],
+                n=1,
+            )
+            logger.info('Successfully received response from GPT: "%s"', gpt_response.choices[0].message.content)
+        except Exception as e:
+            logger.error("Failed to send a test chat completion to the GPT deployment due to error: \n%s", e)
+            return False
 
     logger.info("Starting evaluation...")
     for metric in requested_metrics:
@@ -124,29 +122,44 @@ def run_evaluation(
         metrics_by_name[metric_name] for metric_name in requested_metrics if metric_name in metrics_by_name
     ]
 
-    results = evaluate(
-        target=wrap_target,
-        data=testdata,
-        task_type="qa",
-        metrics_list=[metric.get_metric() for metric in requested_metrics],
-        model_config=openai_config,
-        data_mapping={
-            # The keys in this dictionary must match the variable names of the built-in prompt templates
-            # These values must match field names in qa.jsonl:
-            "question": "question",  # column of data providing input to model
-            "ground_truth": "truth",  # column of data providing ground truth answer, optional for default metrics
-            # These values must match field names in return value of target function:
-            "context": "context",  # column of data providing context for each input
-            "answer": "answer",  # column of data providing output from model
-        },
-        tracking=False,
-        output_path=results_dir,
-    )
+    def evaluate_row(row):
+        output = {}
+        output["question"] = row["question"]
+        output["truth"] = row["truth"]
+        target_response = send_question_to_target(
+            question=row["question"],
+            target_url=target_url,
+            parameters=target_parameters,
+        )
+        output.update(target_response)
+        for metric in requested_metrics:
+            result = metric.evaluator_fn(openai_config=openai_config)(
+                question=row["question"],
+                answer=output["answer"],
+                context=output["context"],
+                ground_truth=row["truth"],
+            )
+            output.update(result)
+
+        return output
+
+    questions_with_ratings = []
+    futures = []
+    import concurrent.futures
+
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        for row in testdata:
+            futures.append(executor.submit(evaluate_row, row))
+        for future in futures:
+            questions_with_ratings.append(future.result())
 
     logger.info("Evaluation calls have completed. Calculating overall metrics now...")
-    eval_results_filename = list(results.artifacts.keys())[0]
-    with open(results_dir / eval_results_filename, encoding="utf-8") as f:
-        questions_with_ratings = [json.loads(question_json) for question_json in f.readlines()]
+    # Make the results directory if it doesn't exist
+    results_dir.mkdir(parents=True, exist_ok=True)
+    # Save the results
+    with open(results_dir / "eval_results.jsonl", "w", encoding="utf-8") as results_file:
+        for row in questions_with_ratings:
+            results_file.write(json.dumps(row, ensure_ascii=False) + "\n")
 
     # Calculate aggregate metrics
     df = pd.DataFrame(questions_with_ratings)
@@ -160,7 +173,7 @@ def run_evaluation(
 
     with open(results_dir / "evaluate_parameters.json", "w", encoding="utf-8") as parameters_file:
         parameters = {
-            "evaluation_gpt_model": openai_config["model"],
+            "evaluation_gpt_model": openai_config.model,
             "evaluation_timestamp": int(time.time()),
             "testdata_path": str(testdata_path),
             "target_url": target_url,
@@ -207,7 +220,8 @@ def run_evaluate_from_config(working_dir, config_path, num_questions, target_url
         target_parameters=config.get("target_parameters", {}),
         num_questions=num_questions,
         requested_metrics=config.get(
-            "requested_metrics", ["groundedness", "relevance", "coherence", "has_citation", "answer_length"]
+            "requested_metrics",
+            ["gpt_groundedness", "gpt_relevance", "gpt_coherence", "answer_length", "latency"],
         ),
     )
 

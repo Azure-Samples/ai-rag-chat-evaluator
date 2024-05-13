@@ -150,3 +150,8 @@ static/
 mlruns/
 
 .DS_Store
+
+blog_input/
+blog_results/
+blog_results_dontknows/
+blog_results_offtopic/

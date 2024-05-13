@@ -184,11 +184,14 @@ Some of those metrics are built-in to the evaluation SDK, and the rest are custo
 These metrics are calculated by sending a call to the GPT model, asking it to provide a 1-5 rating, and storing that rating.
 
 > [!IMPORTANT]
-> The built-in metrics are only intended for use on evaluating English language answers, due to [limitations in the azure-ai-generative SDK](https://github.com/Azure/azure-sdk-for-python/issues/34099).
+> The built-in metrics are only intended for use on evaluating English language answers, since they use English-language prompts internally. For non-English languages, you should use the [custom prompt metrics](#prompt-metrics) instead.
 
 * [`gpt_coherence`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-coherence) measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language.
 * [`gpt_relevance`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-relevance) assesses the ability of answers to capture the key points of the context.
 * [`gpt_groundedness`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-groundedness) assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context.
+* [`gpt_similarity`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-gpt-similarity) measures the similarity between a source data (ground truth) sentence and the generated response by an AI model.
+* [`gpt_fluency`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#ai-assisted-fluency) measures the grammatical proficiency of a generative AI's predicted answer.
+* [`f1_score`](https://learn.microsoft.com/azure/ai-studio/concepts/evaluation-metrics-built-in#traditional-machine-learning-f1-score) Measures the ratio of the number of shared words between the model generation and the ground truth answers.
 
 #### Custom metrics
 
@@ -196,9 +199,9 @@ These metrics are calculated by sending a call to the GPT model, asking it to pr
 
 The following metrics are implemented very similar to the built-in metrics, but use a locally stored prompt. They're a great fit if you find that the built-in metrics are not working well for you or if you need to translate the prompt to another language.
 
-* `coherence`: Measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language. Based on `scripts/evaluate_metrics/prompts/coherence.jinja2`.
-* `relevance`: Assesses the ability of answers to capture the key points of the context. Based on `scripts/evaluate_metrics/prompts/relevance.jinja2`.
-* `groundedness`: Assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context. Based on `scripts/evaluate_metrics/prompts/groundedness.jinja2`.
+* `mycoherence`: Measures how well the language model can produce output that flows smoothly, reads naturally, and resembles human-like language. Based on `scripts/evaluate_metrics/prompts/coherence.prompty`.
+* `myrelevance`: Assesses the ability of answers to capture the key points of the context. Based on `scripts/evaluate_metrics/prompts/relevance.prompty`.
+* `mygroundedness`: Assesses the correspondence between claims in an AI-generated answer and the source context, making sure that these claims are substantiated by the context. Based on `scripts/evaluate_metrics/prompts/groundedness.jinja2`.
 
 ##### Code metrics
 
@@ -331,7 +334,7 @@ We recommend a separate output folder, as you'll likely want to make multiple ru
 Run the evaluation like this:
 
 ```shell
-python -m scripts evaluate --config=example_config_dontknows.json
+python -m scripts evaluate --config=dontknows.config.json
 ```
 
 The results will be stored in the `results_dir` folder, and can be reviewed using the [review tools](#viewing-the-results).

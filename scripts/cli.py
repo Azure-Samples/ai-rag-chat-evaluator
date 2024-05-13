@@ -54,7 +54,7 @@ def generate(
     persource: int = typer.Option(help="Number of questions to generate per source", default=5),
 ):
     generate_test_qa_data(
-        openai_config=service_setup.get_openai_config(),
+        openai_config=service_setup.get_openai_config_dict(),
         search_client=service_setup.get_search_client(),
         num_questions_total=numquestions,
         num_questions_per_source=persource,

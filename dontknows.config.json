@@ -1,12 +1,25 @@
 {
-    "testdata_path": "example_input/qa_dontknows.jsonl",
-    "results_dir": "blog_results_dontknows/gpt35_prompt2",
+    "testdata_path": "blog_input/qa_dontknows.jsonl",
+    "results_dir": "blog_results_dontknows/new_sdk_r2.0",
     "requested_metrics": ["dontknowness", "answer_length", "latency", "has_citation"],
-    "target_url": "http://host.docker.internal:50505/chat",
+    "target_url": "https://app-backend-xw55anu4yrb3k.azurewebsites.net/chat",
     "target_parameters": {
         "overrides": {
-            "semantic_ranker": false,
-            "prompt_template": "<READFILE>blog_input/prompt_sources2.txt"
+            "top": 3,
+            "temperature": 0.3,
+            "minimum_reranker_score": 2.0,
+            "minimum_search_score": 0,
+            "retrieval_mode": "hybrid",
+            "semantic_ranker": true,
+            "semantic_captions": false,
+            "suggest_followup_questions": false,
+            "use_oid_security_filter": false,
+            "use_groups_security_filter": false,
+            "vector_fields": [
+                "embedding"
+            ],
+            "use_gpt4v": false,
+            "gpt4v_input": "textAndImages"
         }
     }
 }

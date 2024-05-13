@@ -24,8 +24,6 @@ def generate_test_qa_data(
         num_questions_total,
         num_questions_per_source,
     )
-    # Account for evaluate vs. generate SDK differences
-    openai_config["deployment"] = openai_config.get("deployment_id")
 
     qa_generator = QADataGenerator(model_config=openai_config)
 

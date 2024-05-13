@@ -12,16 +12,6 @@ class BaseMetric(ABC):
 
     @classmethod
     @abstractmethod
-    def get_metric(cls):
-        """Returns an object that can be used by azure-ai-generative evaluate() function:
-        - A function that takes in data and returns a dictionary of metric values
-        - A PromptMetric object
-        - A string corresponding to a built-in metric
-        """
-        pass
-
-    @classmethod
-    @abstractmethod
     def get_aggregate_stats(cls, df):
         """Returns a dictionary of aggregate statistics for the metric"""
         pass
