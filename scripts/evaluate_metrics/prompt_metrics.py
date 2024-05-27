@@ -15,7 +15,7 @@ class CustomRatingMetric(BaseMetric):
 
     @classmethod
     def get_aggregate_stats(cls, df):
-        return cls.get_aggregate_stats_for_numeric_rating(df, f"{cls.METRIC_NAME}")
+        return cls.get_aggregate_stats_for_numeric_rating(df, f"{cls.METRIC_NAME}_score")
 
 
 class RelevanceMetric(CustomRatingMetric):

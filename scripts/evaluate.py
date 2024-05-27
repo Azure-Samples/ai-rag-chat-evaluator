@@ -5,6 +5,13 @@ from pathlib import Path
 
 import pandas as pd
 import requests
+
+import os
+CUSTOM_AZURE_AI_GENERATIVE_PATH = os.getenv('CUSTOM_AZURE_AI_GENERATIVE_PATH', None)
+if CUSTOM_AZURE_AI_GENERATIVE_PATH:
+    import sys
+    sys.path.insert(0, CUSTOM_AZURE_AI_GENERATIVE_PATH)
+
 from azure.ai.generative.evaluate import evaluate
 
 from . import service_setup
@@ -54,7 +61,10 @@ def send_question_to_target(
                 f"to match the actual schema.\nResponse: {response_dict}"
             )
 
-        response_obj = {"question": question, "truth": truth, "answer": answer, "context": context, "latency": latency}
+        response_obj = {
+            "question": question, "truth": truth, "answer": answer,
+            "context": context, "latency": latency, "data_points": data_points,
+        }
         return response_obj
     except Exception as e:
         if raise_error:
@@ -64,6 +74,7 @@ def send_question_to_target(
             "truth": truth,
             "answer": str(e),
             "context": str(e),
+            "data_points": [],
             "latency": -1,
         }
 
@@ -157,6 +168,7 @@ def run_evaluation(
             "ground_truth": "truth",  # column of data providing ground truth answer, optional for default metrics
             # These values must match field names in return value of target function:
             "context": "context",  # column of data providing context for each input
+            "data_points": "data_points",  # column of data points providing by RAG
             "answer": "answer",  # column of data providing output from model
         },
         tracking=False,

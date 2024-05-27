@@ -149,7 +149,8 @@ class ContextSimilarityMetric(SimilarityMetric):
             # Return no additional data, since latency is already stored in the target response
             question = data["question"]
             context = data["context"]
-            score = cls.calc_cosine_similarity(question, context)
-            return {'context_similarity': score}
+            data_points = data.get("data_points", [context])
+            scores = [cls.calc_cosine_similarity(question, d) for d in data_points]
+            return {'context_similarity': np.mean(scores)}
 
         return context_similarity

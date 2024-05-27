@@ -1,9 +1,16 @@
 requests
 python-dotenv
-azure-ai-generative[evaluate]==1.0.0b8
 promptflow==1.6.0
+promptflow-tools==1.4.0
 azure-search-documents
 typer
 openai>=1.0.0
 pandas
 rich
+
+# Azure AI Services dependencies
+# azure-ai-generative[evaluate]==1.0.0b8
+azure-ai-ml==1.15.0
+azure-ai-resources==1.0.0b8
+azure-common==1.1.28
+azure-core==1.30.1
