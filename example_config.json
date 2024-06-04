@@ -1,23 +1,12 @@
 {
-    "testdata_path": "pamelas_blog_input/qa.jsonl",
-    "results_dir": "pamelas_blog_results/baseline_june3",
-    "requested_metrics": ["mygroundedness", "myrelevance", "answer_length", "latency", "has_citation", "citation_match"],
-    "target_url": "https://app-backend-xw55anu4yrb3k.azurewebsites.net/chat",
+    "testdata_path": "example_input/qa.jsonl",
+    "results_dir": "example_results/experiment<TIMESTAMP>",
+    "requested_metrics": ["gpt_groundedness", "gpt_relevance", "gpt_coherence", "answer_length", "latency"],
+    "target_url": "http://localhost:50505/chat",
     "target_parameters": {
         "overrides": {
-            "top": 3,
-            "temperature": 0.3,
-            "retrieval_mode": "hybrid",
-            "semantic_ranker": true,
-            "semantic_captions": false,
-            "suggest_followup_questions": false,
-            "use_oid_security_filter": false,
-            "use_groups_security_filter": false,
-            "vector_fields": [
-                "embedding"
-            ],
-            "use_gpt4v": false,
-            "gpt4v_input": "textAndImages"
+            "semantic_ranker": false,
+            "prompt_template": "<READFILE>example_input/prompt_refined.txt"
         }
     }
 }
