@@ -1,5 +1,6 @@
 # a CLI tool to diff two JSON files
 import json
+import math
 from pathlib import Path
 
 from textual.app import App, ComposeResult
@@ -27,8 +28,11 @@ class DiffApp(App):
             # filter out questions that have the same value for the given column
             for question in list(self.data_dicts[0].keys()):
                 if self.data_dicts[0][question].get(self.changed) == self.data_dicts[1][question].get(self.changed):
-                    self.data_dicts[0].pop(question)
-                    self.data_dicts[1].pop(question)
+                    if math.isclose(
+                        self.data_dicts[0][question].get(self.changed), self.data_dicts[1][question].get(self.changed)
+                    ):
+                        self.data_dicts[0].pop(question)
+                        self.data_dicts[1].pop(question)
         self.next_question()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
