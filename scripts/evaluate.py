@@ -142,15 +142,10 @@ def run_evaluation(
 
         return output
 
+    # Run evaluations in serial to avoid rate limiting
     questions_with_ratings = []
-    futures = []
-    import concurrent.futures
-
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        for row in testdata:
-            futures.append(executor.submit(evaluate_row, row))
-        for future in futures:
-            questions_with_ratings.append(future.result())
+    for row in testdata:
+        questions_with_ratings.append(evaluate_row(row))
 
     logger.info("Evaluation calls have completed. Calculating overall metrics now...")
     # Make the results directory if it doesn't exist
