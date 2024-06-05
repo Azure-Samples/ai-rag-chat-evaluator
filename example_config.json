@@ -22,6 +22,6 @@
             "gpt4v_input": "textAndImages"
         }
     },
-    "target_response_answer_jmespath": "choices[0].message.content",
-    "target_response_context_jmespath": "choices[0].context.data_points.text"
+    "target_response_answer_jmespath": "message.content",
+    "target_response_context_jmespath": "context.data_points.text"
 }
