@@ -214,11 +214,10 @@ These metrics are calculated with some local code based on the results of the ch
 
 ### Sending additional parameters to the app
 
-This repo assumes that your chat app is following the [Chat App Protocol](https://github.com/Azure-Samples/ai-chat-app-protocol), which means that all POST requests look like this:
+This repo assumes that your chat app is following the [AI Chat Protocol](https://github.com/microsoft/ai-chat-protocol/tree/main/spec#readme), which means that all POST requests look like this:
 
 ```json
 {"messages": [{"content": "<Actual user question goes here>", "role": "user"}],
- "stream": False,
  "context": {...},
 }
 ```
@@ -237,6 +236,18 @@ Any additional app parameters would be specified in the `context` of that JSON, 
 The `overrides` key is the same as the `overrides` key in the `context` of the POST request.
 As a convenience, you can use the `<READFILE>` prefix to read in a file and use its contents as the value for the parameter.
 That way, you can store potential (long) prompts separately from the config JSON file.
+
+### Specifying the location of answer and context in response
+
+The evaluator needs to know where to find the answer and context in the response from the chat app.
+If your app returns responses following the recommendations of the [AI Chat Protocol](https://github.com/microsoft/ai-chat-protocol/tree/main/spec#readme), then the answer will be "message": "content" and the context will be a list of strings in "context": "data_points": "text".
+
+If your app returns responses in a different format, you can specify the [JMESPath expressions](https://jmespath.org/) to extract the answer and context from the response. For example:
+
+```json
+    "target_response_answer_jmespath": "message.content",
+    "target_response_context_jmespath": "context.data_points.text"
+```
 
 ## Viewing the results
 
@@ -325,7 +336,9 @@ Here's an example configuration JSON that requests that metric, referencing the 
     "requested_metrics": ["dontknowness", "answer_length", "latency", "has_citation"],
     "target_url": "http://localhost:50505/chat",
     "target_parameters": {
-    }
+    },
+    "target_response_answer_jmespath": "message.content",
+    "target_response_context_jmespath": "context.data_points.text"
 }
 ```
 
