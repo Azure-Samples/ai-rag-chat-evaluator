@@ -3,8 +3,10 @@ import logging
 import time
 from pathlib import Path
 
+import jmespath
 import pandas as pd
 import requests
+from rich.progress import track
 
 from . import service_setup
 from .evaluate_metrics import metrics_by_name
@@ -12,15 +14,21 @@ from .evaluate_metrics import metrics_by_name
 logger = logging.getLogger("scripts")
 
 
-def send_question_to_target(question: str, target_url: str, parameters: dict = {}, raise_error=False):
+def send_question_to_target(
+    question: str,
+    url: str,
+    parameters: dict = {},
+    raise_error=False,
+    response_answer_jmespath="message.content",
+    response_context_jmespath="context.data_points.text",
+):
     headers = {"Content-Type": "application/json"}
     body = {
         "messages": [{"content": question, "role": "user"}],
-        "stream": False,
         "context": parameters,
     }
     try:
-        r = requests.post(target_url, headers=headers, json=body)
+        r = requests.post(url, headers=headers, json=body)
         r.encoding = "utf-8"
 
         latency = r.elapsed.total_seconds()
@@ -29,17 +37,19 @@ def send_question_to_target(question: str, target_url: str, parameters: dict = {
             response_dict = r.json()
         except json.JSONDecodeError:
             raise ValueError(
-                f"Response from target {target_url} is not valid JSON:\n\n{r.text} \n"
-                "Make sure that your configuration points at a chat endpoint that returns JSON.\n"
+                f"Response from target {url} is not valid JSON:\n\n{r.text} \n"
+                "Make sure that your configuration points at a chat endpoint that returns a single JSON object.\n"
             )
 
         try:
-            answer = response_dict["choices"][0]["message"]["content"]
-            data_points = response_dict["choices"][0]["context"]["data_points"]["text"]
+            answer = jmespath.search(response_answer_jmespath, response_dict)
+            data_points = jmespath.search(response_context_jmespath, response_dict)
             context = "\n\n".join(data_points)
         except Exception:
             raise ValueError(
                 "Response does not adhere to the expected schema. "
+                f"The answer should be accessible via the JMESPath expression '{response_answer_jmespath}' "
+                f"and the context should be accessible via the JMESPath expression '{response_context_jmespath}'. "
                 "Either adjust the app response or adjust send_question_to_target() in evaluate.py "
                 f"to match the actual schema.\nResponse: {response_dict}"
             )
@@ -73,6 +83,8 @@ def run_evaluation(
     target_parameters={},
     requested_metrics=[],
     num_questions=None,
+    target_response_answer_jmespath=None,
+    target_response_context_jmespath=None,
 ):
     logger.info("Running evaluation using data from %s", testdata_path)
     testdata = load_jsonl(testdata_path)
@@ -88,6 +100,8 @@ def run_evaluation(
             target_url,
             target_parameters,
             raise_error=True,
+            response_answer_jmespath=target_response_answer_jmespath,
+            response_context_jmespath=target_response_context_jmespath,
         )
         logger.info(
             'Successfully received response from target for question: "%s"\n"answer": "%s"\n"context": "%s"',
@@ -127,8 +141,10 @@ def run_evaluation(
         output["truth"] = row["truth"]
         target_response = send_question_to_target(
             question=row["question"],
-            target_url=target_url,
+            url=target_url,
             parameters=target_parameters,
+            response_answer_jmespath=target_response_answer_jmespath,
+            response_context_jmespath=target_response_context_jmespath,
         )
         output.update(target_response)
         for metric in requested_metrics:
@@ -144,7 +160,7 @@ def run_evaluation(
 
     # Run evaluations in serial to avoid rate limiting
     questions_with_ratings = []
-    for row in testdata:
+    for row in track(testdata, description="Processing..."):
         questions_with_ratings.append(evaluate_row(row))
 
     logger.info("Evaluation calls have completed. Calculating overall metrics now...")
@@ -217,6 +233,8 @@ def run_evaluate_from_config(working_dir, config_path, num_questions, target_url
             "requested_metrics",
             ["gpt_groundedness", "gpt_relevance", "gpt_coherence", "answer_length", "latency"],
         ),
+        target_response_answer_jmespath=config.get("target_response_answer_jmespath"),
+        target_response_context_jmespath=config.get("target_response_context_jmespath"),
     )
 
     if evaluation_run_complete:

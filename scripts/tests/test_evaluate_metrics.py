@@ -12,6 +12,14 @@ def test_answer_length():
     assert metric.get_aggregate_stats(df) == {"mean": 11.67, "max": 20, "min": 5}
 
 
+def test_answer_length_new():
+    metric = code_metrics.AnswerLengthMetric()
+    metric_function = metric.evaluator_fn()
+    assert metric_function(answer=None) == {"answer_length": -1}
+    df = pd.DataFrame([{"answer_length": 20}, {"answer_length": 10}, {"answer_length": 5}, {"answer_length": -1}])
+    assert metric.get_aggregate_stats(df) == {"mean": 11.67, "max": 20, "min": 5}
+
+
 def test_has_citation():
     metric = code_metrics.HasCitationMetric()
     metric_function = metric.evaluator_fn()
@@ -21,6 +29,14 @@ def test_has_citation():
 
     df = pd.DataFrame([{"has_citation": True}, {"has_citation": False}, {"has_citation": True}])
     assert metric.get_aggregate_stats(df) == {"total": 2, "rate": 0.67}
+
+
+def test_has_citation_none():
+    metric = code_metrics.HasCitationMetric()
+    metric_function = metric.evaluator_fn()
+    assert metric_function(answer=None) == {"has_citation": -1}
+    df = pd.DataFrame([{"has_citation": True}, {"has_citation": False}, {"has_citation": -1}])
+    assert metric.get_aggregate_stats(df) == {"total": 1, "rate": 0.5}
 
 
 def test_citation_match():
@@ -46,6 +62,14 @@ def test_citation_match_filenames_only():
     metric = code_metrics.CitationMatchMetric()
     metric_function = metric.evaluator_fn()
     assert metric_function(ground_truth=truth, answer=answer) == {"citation_match": True}
+
+
+def test_citation_match_none():
+    metric = code_metrics.CitationMatchMetric()
+    metric_function = metric.evaluator_fn()
+    assert metric_function(ground_truth="Answer", answer=None) == {"citation_match": -1}
+    df = pd.DataFrame([{"citation_match": True}, {"citation_match": False}, {"citation_match": -1}])
+    assert metric.get_aggregate_stats(df) == {"total": 1, "rate": 0.5}
 
 
 def test_latency():
