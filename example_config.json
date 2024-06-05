@@ -5,8 +5,23 @@
     "target_url": "http://localhost:50505/chat",
     "target_parameters": {
         "overrides": {
-            "semantic_ranker": false,
-            "prompt_template": "<READFILE>example_input/prompt_refined.txt"
+            "top": 3,
+            "temperature": 0.3,
+            "minimum_reranker_score": 0,
+            "minimum_search_score": 0,
+            "retrieval_mode": "hybrid",
+            "semantic_ranker": true,
+            "semantic_captions": false,
+            "suggest_followup_questions": false,
+            "use_oid_security_filter": false,
+            "use_groups_security_filter": false,
+            "vector_fields": [
+                "embedding"
+            ],
+            "use_gpt4v": false,
+            "gpt4v_input": "textAndImages"
         }
-    }
+    },
+    "target_response_answer_jmespath": "choices[0].message.content",
+    "target_response_context_jmespath": "choices[0].context.data_points.text"
 }
