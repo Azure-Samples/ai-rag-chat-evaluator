@@ -18,7 +18,7 @@ def generate_test_qa_data(
     num_questions_total: int,
     num_questions_per_source: int,
     output_file: Path,
-    citation_field_name: str
+    citation_field_name: str,
 ):
     logger.info(
         "Generating %d questions total, %d per source, based on search results",
