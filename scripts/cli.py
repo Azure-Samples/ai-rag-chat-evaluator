@@ -61,7 +61,7 @@ def generate(
         num_questions_total=numquestions,
         num_questions_per_source=persource,
         output_file=Path.cwd() / output,
-        citation_field_name = citationfieldname,
+        citation_field_name=citationfieldname,
     )
 
 
