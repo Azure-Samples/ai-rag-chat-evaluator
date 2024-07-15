@@ -135,6 +135,14 @@ This repo includes a script for generating questions and answers from documents 
 
     To further customize the generator beyond the `numquestions` and `persource` parameters, modify `scripts/generate.py`.
 
+    Optional: 
+
+    By default this script assumes your index citation field is named `sourcepage`, if your search index contains a different citation field name use the `citationfieldname` option to specify the correct name  
+
+    ```shell
+    python -m scripts generate --output=example_input/qa.jsonl --numquestions=200 --persource=5 --citationfieldname=filepath
+    ```
+
 ## Running an evaluation
 
 We provide a script that loads in the current `azd` environment's variables, installs the requirements for the evaluation, and runs the evaluation against the local app. Run it like this:

@@ -52,7 +52,7 @@ def generate(
     output: Path = typer.Option(exists=False, dir_okay=False, file_okay=True),
     numquestions: int = typer.Option(help="Number of questions to generate", default=200),
     persource: int = typer.Option(help="Number of questions to generate per source", default=5),
-    citation_field_name: str = typer.Option(help="Name of citiation field in ai search index", default="sourcepage"),
+    citationfieldname: str = typer.Option(help="Name of citiation field in ai search index", default="sourcepage"),
 
 ):
     generate_test_qa_data(
@@ -61,7 +61,7 @@ def generate(
         num_questions_total=numquestions,
         num_questions_per_source=persource,
         output_file=Path.cwd() / output,
-        citation_field_name
+        citation_field_name = citationfieldname,
     )
 
 
