@@ -10,6 +10,8 @@ class AnswerLengthMetric(BaseMetric):
 
     METRIC_NAME = "answer_length"
 
+    # __call__ , __aggregate__
+
     @classmethod
     def evaluator_fn(cls, **kwargs):
         def answer_length(*, answer, **kwargs):

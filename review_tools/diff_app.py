@@ -5,7 +5,7 @@ from pathlib import Path
 
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, VerticalScroll
-from textual.widgets import Button, DataTable, Markdown, Static
+from textual.widgets import Button, DataTable, Markdown, Static, TextArea
 
 
 class DiffApp(App):
@@ -43,7 +43,7 @@ class DiffApp(App):
 
     def compose(self) -> ComposeResult:
         with Vertical():
-            yield Static(id="question")
+            yield TextArea(id="question")
             with Horizontal(id="sources"):
                 for directory in self.directories:
                     yield Static(directory.name, classes="source")
@@ -68,7 +68,7 @@ class DiffApp(App):
             self.exit()
             return
         question = list(self.data_dicts[0].keys())[self.result_index]
-        self.query_one("#question", Static).update(question)
+        self.query_one("#question", TextArea).text = question
 
         for ind in range(len(self.directories)):
             try:

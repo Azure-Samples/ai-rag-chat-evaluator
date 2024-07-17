@@ -23,8 +23,11 @@ def diff(
 
 
 @app.command()
-def summary(results_dir: Path = typer.Argument(exists=True, dir_okay=True, file_okay=False)):
-    summary_app.main(results_dir)
+def summary(
+    results_dir: Path = typer.Argument(exists=True, dir_okay=True, file_okay=False),
+    format: str = typer.Option("tui", help="Output format: tui, markdown, html"),
+):
+    summary_app.main(results_dir, format)
 
 
 def cli():
