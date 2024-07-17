@@ -18,6 +18,7 @@ def generate_test_qa_data(
     num_questions_total: int,
     num_questions_per_source: int,
     output_file: Path,
+    citation_field_name: str,
 ):
     logger.info(
         "Generating %d questions total, %d per source, based on search results",
@@ -32,7 +33,7 @@ def generate_test_qa_data(
     for doc in r:
         if len(qa) > num_questions_total:
             break
-        logger.info("Processing search document %s", doc["sourcepage"])
+        logger.info("Processing search document %s", doc[citation_field_name])
         text = doc["content"]
 
         result = qa_generator.generate(
@@ -42,7 +43,7 @@ def generate_test_qa_data(
         )
 
         for question, answer in result["question_answers"]:
-            citation = f"[{doc['sourcepage']}]"
+            citation = f"[{doc[citation_field_name]}]"
             qa.append({"question": question, "truth": answer + citation})
 
     logger.info("Writing %d questions to %s", len(qa), output_file)
