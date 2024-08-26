@@ -1,0 +1,22 @@
+{
+    "gpt_groundedness": {
+        "pass_count": 193,
+        "pass_rate": 0.96,
+        "mean_rating": 4.87
+    },
+    "gpt_relevance": {
+        "pass_count": 197,
+        "pass_rate": 0.98,
+        "mean_rating": 4.92
+    },
+    "answer_length": {
+        "mean": 613.11,
+        "max": 2210,
+        "min": 52
+    },
+    "latency": {
+        "mean": 2.35,
+        "max": 5.531913,
+        "min": 1.239641
+    }
+}
