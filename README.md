@@ -12,12 +12,24 @@ that we've run on our [sample chat app](https://github.com/Azure-Samples/azure-s
 
 Table of contents:
 
+* [Cost estimation](#cost-estimation)
 * [Setting up this project](#setting-up-this-project)
 * [Deploying a GPT-4 model](#deploying-a-gpt-4-model)
 * [Generating ground truth data](#generating-ground-truth-data)
 * [Running an evaluation](#running-an-evaluation)
 * [Viewing the results](#viewing-the-results)
 * [Measuring app's ability to say "I don't know"](#measuring-apps-ability-to-say-i-dont-know)
+
+## Cost estimation
+
+There are several places where this project can incur costs:
+
+| Cost | Description | Estimated tokens used |
+| --- | --- | --- |
+| Generating ground truth data | This is a one-time cost for generating the initial set of questions and answers, and involves pulling data down from your search index and sending it to the GPT model. | 1000 tokens per question generated, which would be 200,000 tokens for the recommended 200 questions. |
+| Running evaluations | Each time you run an evaluation, you may choose to use the GPT-based evaluators (groundedness, coherence, etc). For each GPT-evaluator used, you will incur costs for the tokens used by the GPT model. | 1000 tokens per question per evaluator used, which would be 600,000 tokens for the default 200 questions and 3 evaluators. |
+
+For a full estimate of the costs for your region and model, see the [Azure OpenAI pricing page](https://azure.microsoft.com/pricing/details/cognitive-services/openai-service/) or use the [Azure OpenAI pricing calculator](https://azure.com/e/f0dc5c3acb43437d925209c09c775a6d).
 
 ## Setting up this project
 
@@ -135,9 +147,9 @@ This repo includes a script for generating questions and answers from documents 
 
     To further customize the generator beyond the `numquestions` and `persource` parameters, modify `scripts/generate.py`.
 
-    Optional: 
+    Optional:
 
-    By default this script assumes your index citation field is named `sourcepage`, if your search index contains a different citation field name use the `citationfieldname` option to specify the correct name  
+    By default this script assumes your index citation field is named `sourcepage`, if your search index contains a different citation field name use the `citationfieldname` option to specify the correct name
 
     ```shell
     python -m scripts generate --output=example_input/qa.jsonl --numquestions=200 --persource=5 --citationfieldname=filepath
