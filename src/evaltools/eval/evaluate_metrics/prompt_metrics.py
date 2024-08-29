@@ -13,7 +13,6 @@ logger = logging.getLogger("scripts")
 
 
 class PromptBasedEvaluator:
-
     def __init__(self, model_config, path, name):
         prompty_model_config = {"configuration": model_config}
         self._name = name
@@ -38,7 +37,6 @@ class PromptBasedEvaluator:
 
 
 class CustomRatingMetric(BaseMetric):
-
     @classmethod
     def evaluator_fn(cls, openai_config, **kwargs):
         return PromptBasedEvaluator(
@@ -51,20 +49,16 @@ class CustomRatingMetric(BaseMetric):
 
 
 class RelevanceMetric(CustomRatingMetric):
-
     METRIC_NAME = "myrelevance"
 
 
 class CoherenceMetric(CustomRatingMetric):
-
     METRIC_NAME = "mycoherence"
 
 
 class GroundednessMetric(CustomRatingMetric):
-
     METRIC_NAME = "mygroundedness"
 
 
 class DontKnownessMetric(CustomRatingMetric):
-
     METRIC_NAME = "dontknowness"

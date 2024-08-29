@@ -5,9 +5,10 @@ import dotenv
 import typer
 from rich.logging import RichHandler
 
-from . import service_setup
-from .evaluate import run_evaluate_from_config
-from .generate import generate_dontknows_qa_data, generate_test_qa_data
+from evaltools import service_setup
+from evaltools.eval.evaluate import run_evaluate_from_config
+from evaltools.gen.generate import generate_dontknows_qa_data, generate_test_qa_data_for_search_index
+from evaltools.review import diff_app, summary_app
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -31,30 +32,13 @@ def str_or_none(raw: str) -> str | None:
 
 
 @app.command()
-def evaluate(
-    config: Path = typer.Option(
-        exists=True, dir_okay=False, file_okay=True, help="Path to config.json", default="config.json"
-    ),
-    numquestions: int | None = typer.Option(
-        help="Number of questions to evaluate (defaults to all if not specified).", default=None, parser=int_or_none
-    ),
-    targeturl: str | None = typer.Option(
-        help="URL of the target service to evaluate against (defaults to the one in the config).",
-        default=None,
-        parser=str_or_none,
-    ),
-):
-    run_evaluate_from_config(Path.cwd(), config, numquestions, targeturl)
-
-
-@app.command()
 def generate(
     output: Path = typer.Option(exists=False, dir_okay=False, file_okay=True),
     numquestions: int = typer.Option(help="Number of questions to generate", default=200),
     persource: int = typer.Option(help="Number of questions to generate per source", default=5),
     citationfieldname: str = typer.Option(help="Name of citiation field in ai search index", default="sourcepage"),
 ):
-    generate_test_qa_data(
+    generate_test_qa_data_for_search_index(
         openai_config=service_setup.get_openai_config_dict(),
         search_client=service_setup.get_search_client(),
         num_questions_total=numquestions,
@@ -76,6 +60,43 @@ def generate_dontknows(
         input_file=Path.cwd() / input,
         output_file=Path.cwd() / output,
     )
+
+
+@app.command()
+def evaluate(
+    config: Path = typer.Option(
+        exists=True, dir_okay=False, file_okay=True, help="Path to config.json", default="config.json"
+    ),
+    numquestions: int | None = typer.Option(
+        help="Number of questions to evaluate (defaults to all if not specified).", default=None, parser=int_or_none
+    ),
+    targeturl: str | None = typer.Option(
+        help="URL of the target service to evaluate against (defaults to the one in the config).",
+        default=None,
+        parser=str_or_none,
+    ),
+):
+    run_evaluate_from_config(Path.cwd(), config, numquestions, targeturl)
+
+
+def str_or_none(value: str) -> str | None:
+    return value if value != "None" else None
+
+
+@app.command()
+def diff(
+    directory1: Path = typer.Argument(exists=True, dir_okay=True, file_okay=False),
+    directory2: Path = typer.Argument(default=None, exists=True, dir_okay=True, file_okay=False),
+    changed: str | None = typer.Option(
+        help="Show only questions whose values changed for the given column", default=None, parser=str_or_none
+    ),
+):
+    diff_app.main(directory1, directory2, changed)
+
+
+@app.command()
+def summary(results_dir: Path = typer.Argument(exists=True, dir_okay=True, file_okay=False)):
+    summary_app.main(results_dir)
 
 
 def cli():

@@ -8,7 +8,8 @@ import pandas as pd
 import requests
 from rich.progress import track
 
-from . import service_setup
+from evaltools import service_setup
+
 from .evaluate_metrics import metrics_by_name
 
 logger = logging.getLogger("scripts")
@@ -233,8 +234,8 @@ def run_evaluate_from_config(working_dir, config_path, num_questions, target_url
             "requested_metrics",
             ["gpt_groundedness", "gpt_relevance", "gpt_coherence", "answer_length", "latency"],
         ),
-        target_response_answer_jmespath=config.get("target_response_answer_jmespath"),
-        target_response_context_jmespath=config.get("target_response_context_jmespath"),
+        target_response_answer_jmespath=config.get("target_response_answer_jmespath", "message.content"),
+        target_response_context_jmespath=config.get("target_response_context_jmespath", "context.data_points.text"),
     )
 
     if evaluation_run_complete:

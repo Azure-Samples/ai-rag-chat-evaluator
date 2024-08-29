@@ -61,7 +61,7 @@ Before you submit your Pull Request (PR) consider the following guidelines:
 * Install the development tools and pre-commit hooks:
 
    ```shell
-   python3 -m pip install -r requirements-dev.txt
+   python3 -m pip install -e ."[dev"]
    pre-commit install
    ```
 

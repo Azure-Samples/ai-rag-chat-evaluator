@@ -38,10 +38,10 @@ If not, then follow these steps:
 
 1. Install Python 3.10 or higher
 2. Create a Python [virtual environment](https://learn.microsoft.com/azure/developer/python/get-started?tabs=cmd#configure-python-virtual-environment).
-2. Inside that virtual environment, install the requirements:
+3. Inside that virtual environment, install the project:
 
     ```shell
-    python -m pip install -r requirements.txt
+    python -m pip install -e .
     ```
 
 ## Deploying a GPT-4 model
@@ -57,18 +57,17 @@ We've made that easy to deploy with the `azd` CLI tool.
 1. Install the [Azure Developer CLI](https://aka.ms/azure-dev/install)
 2. Run `azd auth login` to log in to your Azure account
 3. Run `azd up` to deploy a new GPT-4 instance
-4. Create a `.env` file based on the provisioned resources by running one of the following commands.
-
-    Bash:
+4. Create a `.env` file based on `.env.sample`:
 
     ```shell
-    azd env get-values > .env
+    cp .env.sample .env
     ```
 
-    PowerShell:
+5. Run this commands to get the required values for `AZURE_OPENAI_EVAL_DEPLOYMENT` and `AZURE_OPENAI_SERVICE` from your deployed resource group and paste those values into the `.env` file:
 
-    ```powershell
-    $output = azd env get-values; Add-Content -Path .env -Value $output;
+    ```shell
+    azd env get-value AZURE_OPENAI_EVAL_DEPLOYMENT
+    azd env get-value AZURE_OPENAI_SERVICE
     ```
 
 ### Using an existing Azure OpenAI instance
@@ -140,7 +139,7 @@ This repo includes a script for generating questions and answers from documents 
 3. Run the generator script:
 
     ```shell
-    python -m scripts generate --output=example_input/qa.jsonl --numquestions=200 --persource=5
+    python -m evaltools generate --output=example_input/qa.jsonl --persource=5 --numquestions=200
     ```
 
     That script will generate 200 questions and answers, and store them in `example_input/qa.jsonl`. We've already provided an example based off the sample documents for this app.
@@ -152,7 +151,7 @@ This repo includes a script for generating questions and answers from documents 
     By default this script assumes your index citation field is named `sourcepage`, if your search index contains a different citation field name use the `citationfieldname` option to specify the correct name
 
     ```shell
-    python -m scripts generate --output=example_input/qa.jsonl --numquestions=200 --persource=5 --citationfieldname=filepath
+    python -m evaltools generate --output=example_input/qa.jsonl --persource=5 --numquestions=200 --citationfieldname=filepath
     ```
 
 ## Running an evaluation
@@ -160,7 +159,7 @@ This repo includes a script for generating questions and answers from documents 
 We provide a script that loads in the current `azd` environment's variables, installs the requirements for the evaluation, and runs the evaluation against the local app. Run it like this:
 
 ```shell
-python -m scripts evaluate --config=example_config.json
+python -m evaltools evaluate --config=example_config.json
 ```
 
 The config.json should contain these fields as a minimum:
@@ -191,7 +190,7 @@ To run against a deployed endpoint, change the `target_url` to the chat endpoint
 It's common to run the evaluation on a subset of the questions, to get a quick sense of how the changes are affecting the answers. To do this, use the `--numquestions` parameter:
 
 ```shell
-python -m scripts evaluate --config=example_config.json --numquestions=2
+python -m evaltools evaluate --config=example_config.json --numquestions=2
 ```
 
 ### Specifying the evaluate metrics
@@ -287,7 +286,7 @@ located inside the `review-tools` folder.
 To view a summary across all the runs, use the `summary` command with the path to the results folder:
 
 ```bash
-python -m review_tools summary example_results
+python -m evaltools summary example_results
 ```
 
 This will display an interactive table with the results for each run, like this:
@@ -302,7 +301,7 @@ A modal will appear with the parameters, including any prompt override.
 To compare the answers generated for each question across 2 runs, use the `compare` command with 2 paths:
 
 ```bash
-python -m review_tools diff example_results/baseline_1 example_results/baseline_2
+python -m evaltools diff example_results/baseline_1 example_results/baseline_2
 ```
 
 This will display each question, one at a time, with the two generated answers in scrollable panes,
@@ -315,7 +314,7 @@ Use the buttons at the bottom to navigate to the next question or quit the tool.
 You can also filter to only show questions where the value changed for a particular metric, like this:
 
 ```bash
-python -m review_tools diff example_results/baseline_1 example_results/baseline_2 --changed=has_citation
+python -m evaltools diff example_results/baseline_1 example_results/baseline_2 --changed=has_citation
 ```
 
 ## Measuring app's ability to say "I don't know"
@@ -336,7 +335,7 @@ You can write these questions manually, but it’s also possible to generate the
 assuming you already have ground truth data with answerable questions.
 
 ```shell
-python -m scripts generate-dontknows --input=example_input/qa.jsonl --output=example_input/qa_dontknows.jsonl --numquestions=45
+python -m evaltools generate-dontknows --input=example_input/qa.jsonl --output=example_input/qa_dontknows.jsonl --numquestions=45
 ```
 
 That script sends the current questions to the configured GPT-4 model along with prompts to generate questions of each kind.
@@ -367,7 +366,7 @@ We recommend a separate output folder, as you'll likely want to make multiple ru
 Run the evaluation like this:
 
 ```shell
-python -m scripts evaluate --config=dontknows.config.json
+python -m evaltools evaluate --config=dontknows.config.json
 ```
 
 The results will be stored in the `results_dir` folder, and can be reviewed using the [review tools](#viewing-the-results).

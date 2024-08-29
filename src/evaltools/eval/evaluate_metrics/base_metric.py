@@ -7,7 +7,6 @@ logger = logging.getLogger("scripts")
 
 
 class BaseMetric(ABC):
-
     METRIC_NAME = "name_of_metric"
 
     @classmethod
