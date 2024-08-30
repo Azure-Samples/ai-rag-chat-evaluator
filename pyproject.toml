@@ -10,13 +10,13 @@ addopts = "-ra"
 
 [project]
 name = "evaltools"
-version = "0.1.0"
+version = "0.1.1"
 description = "Evaluate chat applications using Azure OpenAI evaluators"
 dependencies = [
     "requests",
     "python-dotenv",
     "azure-ai-generative[evaluate]==1.0.0b8",
-    "promptflow-evals==0.3.0",
+    "promptflow-evals==0.3.2",
     "azure-search-documents",
     "typer",
     "openai>=1.0.0",
