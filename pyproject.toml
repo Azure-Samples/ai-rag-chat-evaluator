@@ -33,3 +33,6 @@ dev = [
     "black",
     "pytest"
 ]
+
+[tool.setuptools.package-data]
+evaltools = ["*.tcss"]
