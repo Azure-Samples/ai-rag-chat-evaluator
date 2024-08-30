@@ -35,4 +35,4 @@ dev = [
 ]
 
 [tool.setuptools.package-data]
-evaltools = ["*.tcss"]
+evaltools = ["review/*.tcss"]
