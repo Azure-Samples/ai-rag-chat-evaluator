@@ -45,10 +45,13 @@ def send_question_to_target(
         try:
             answer = jmespath.search(response_answer_jmespath, response_dict)
             data_points = jmespath.search(response_context_jmespath, response_dict)
-            # if data_points is a list of dicts, stringify them
-            if isinstance(data_points, list) and all(isinstance(item, dict) for item in data_points):
-                data_points = [json.dumps(item, ensure_ascii=False) for item in data_points]
-            context = "\n\n".join(data_points)
+            if isinstance(data_points, dict):
+                context = json.dumps(data_points, ensure_ascii=False)
+            elif isinstance(data_points, list):
+                context = "\n\n".join(data_points)
+            else:
+                # Hopefully it's a string
+                context = data_points
         except Exception:
             raise ValueError(
                 "Response does not adhere to the expected schema. "
