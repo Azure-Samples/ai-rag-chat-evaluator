@@ -38,7 +38,7 @@ If not, then follow these steps:
 
 1. Install Python 3.10 or higher
 2. Create a Python [virtual environment](https://learn.microsoft.com/azure/developer/python/get-started?tabs=cmd#configure-python-virtual-environment).
-2. Inside that virtual environment, install the requirements:
+3. Inside that virtual environment, install the requirements:
 
     ```shell
     python -m pip install -r requirements.txt
