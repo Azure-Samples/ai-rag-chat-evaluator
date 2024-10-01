@@ -95,7 +95,7 @@ def get_search_client():
     )
 
 
-def get_openai_client(oai_config: AzureOpenAIModelConfiguration | OpenAIModelConfiguration):
+def get_openai_client(oai_config: Union[AzureOpenAIModelConfiguration, OpenAIModelConfiguration]):
     if "azure_deployment" in oai_config:
         azure_token_provider = None
         if not os.environ.get("AZURE_OPENAI_KEY"):
