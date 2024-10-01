@@ -1,5 +1,6 @@
 import logging
 import os
+from typing import Union
 
 import openai
 from azure.ai.evaluation import AzureOpenAIModelConfiguration, OpenAIModelConfiguration
@@ -10,7 +11,7 @@ from azure.search.documents import SearchClient
 logger = logging.getLogger("scripts")
 
 
-def get_azd_credential(tenant_id: str | None) -> AzureDeveloperCliCredential:
+def get_azd_credential(tenant_id: Union[str, None]) -> AzureDeveloperCliCredential:
     if tenant_id:
         return AzureDeveloperCliCredential(tenant_id=tenant_id, process_timeout=60)
     return AzureDeveloperCliCredential(process_timeout=60)
