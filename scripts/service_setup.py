@@ -10,9 +10,15 @@ from azure.search.documents import SearchClient
 logger = logging.getLogger("scripts")
 
 
-def get_openai_config() -> AzureOpenAIModelConfiguration | OpenAIModelConfiguration:
+def get_azd_credential(tenant_id: str | None) -> AzureDeveloperCliCredential:
+    if tenant_id:
+        return AzureDeveloperCliCredential(tenant_id=tenant_id, process_timeout=60)
+    return AzureDeveloperCliCredential(process_timeout=60)
+
+
+def get_openai_config() -> dict:
     if os.environ.get("OPENAI_HOST") == "azure":
-        azure_endpoint = f"https://{os.environ['AZURE_OPENAI_SERVICE']}.openai.azure.com"
+        azure_endpoint = os.environ.get("AZURE_OPENAI_ENDPOINT")
         azure_deployment = os.environ.get("AZURE_OPENAI_EVAL_DEPLOYMENT")
         if os.environ.get("AZURE_OPENAI_KEY"):
             logger.info("Using Azure OpenAI Service with API Key from AZURE_OPENAI_KEY")
@@ -51,11 +57,11 @@ def get_openai_config_dict() -> dict:
             api_key = os.environ["AZURE_OPENAI_KEY"]
         else:
             logger.info("Using Azure OpenAI Service with Azure Developer CLI Credential")
-            azure_credential = AzureDeveloperCliCredential()
+            azure_credential = get_azd_credential(os.environ.get("AZURE_OPENAI_TENANT_ID"))
             api_key = azure_credential.get_token("https://cognitiveservices.azure.com/.default").token
         openai_config = {
             "api_type": "azure",
-            "api_base": f"https://{os.environ['AZURE_OPENAI_SERVICE']}.openai.azure.com",
+            "api_base": os.environ["AZURE_OPENAI_ENDPOINT"],
             "api_key": api_key,
             "api_version": "2024-02-15-preview",
             "deployment": os.environ["AZURE_OPENAI_EVAL_DEPLOYMENT"],
@@ -79,10 +85,10 @@ def get_search_client():
         azure_credential = AzureKeyCredential(api_key)
     else:
         logger.info("Using Azure Search Service with Azure Developer CLI Credential")
-        azure_credential = AzureDeveloperCliCredential()
+        azure_credential = get_azd_credential(os.environ.get("AZURE_SEARCH_TENANT_ID"))
 
     return SearchClient(
-        endpoint=f"https://{os.environ['AZURE_SEARCH_SERVICE']}.search.windows.net",
+        endpoint=os.environ["AZURE_SEARCH_ENDPOINT"],
         index_name=os.environ["AZURE_SEARCH_INDEX"],
         credential=azure_credential,
     )
@@ -92,12 +98,7 @@ def get_openai_client(oai_config: AzureOpenAIModelConfiguration | OpenAIModelCon
     if "azure_deployment" in oai_config:
         azure_token_provider = None
         if not os.environ.get("AZURE_OPENAI_KEY"):
-            if os.environ.get("AZURE_TENANT_ID"):
-                azure_credential = AzureDeveloperCliCredential(
-                    tenant_id=os.environ["AZURE_TENANT_ID"], process_timeout=60
-                )
-            else:
-                azure_credential = AzureDeveloperCliCredential(process_timeout=60)
+            azure_credential = get_azd_credential(os.environ.get("AZURE_OPENAI_TENANT_ID"))
             azure_token_provider = get_bearer_token_provider(
                 azure_credential, "https://cognitiveservices.azure.com/.default"
             )

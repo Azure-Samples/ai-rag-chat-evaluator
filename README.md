@@ -57,18 +57,11 @@ We've made that easy to deploy with the `azd` CLI tool.
 1. Install the [Azure Developer CLI](https://aka.ms/azure-dev/install)
 2. Run `azd auth login` to log in to your Azure account
 3. Run `azd up` to deploy a new GPT-4 instance
-4. Create a `.env` file based on the provisioned resources by running one of the following commands.
-
-    Bash:
+4. Create a `.env` file based on the provisioned resources by copying `.env.sample` and filling in the required values.
+   You can run this command to see the deployed values:
 
     ```shell
-    azd env get-values > .env
-    ```
-
-    PowerShell:
-
-    ```powershell
-    $output = azd env get-values; Add-Content -Path .env -Value $output;
+    azd env get-values
     ```
 
 ### Using an existing Azure OpenAI instance
@@ -80,7 +73,7 @@ If you already have an Azure OpenAI instance, you can use that instead of creati
 
     ```shell
     AZURE_OPENAI_EVAL_DEPLOYMENT="<deployment-name>"
-    AZURE_OPENAI_SERVICE="<service-name>"
+    AZURE_OPENAI_ENDPOINT="https://<service-name>.openai.azure.com"
     ```
 
 3. The scripts default to keyless access (via `AzureDefaultCredential`), but you can optionally use a key by setting `AZURE_OPENAI_KEY` in `.env`.
@@ -129,7 +122,7 @@ This repo includes a script for generating questions and answers from documents 
 2. Fill in the values for your Azure AI Search instance:
 
     ```shell
-    AZURE_SEARCH_SERVICE="<service-name>"
+    AZURE_SEARCH_ENDPOINT="https://<service-name>.search.windows.net"
     AZURE_SEARCH_INDEX="<index-name>"
     AZURE_SEARCH_KEY=""
     ```
