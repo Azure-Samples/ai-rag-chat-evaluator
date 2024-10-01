@@ -27,7 +27,7 @@ sample:
   answer: The main goals of the Perseverance Mars rover mission are to search for signs of ancient life and collect rock and soil samples for possible return to Earth.
 ---
 system:
-You are an AI assistant. You will be given the definition of an evaluation metric for assessing the quality of an answer in a question-answering task. Your job is to compute an accurate evaluation score using the provided evaluation metric.
+You are an AI assistant. You will be given the definition of an evaluation metric for assessing the quality of an answer in a question-answering task. Your job is to compute an accurate evaluation score using the provided evaluation metric. You should return a single integer value between 1 to 5 representing the evaluation metric. You will include no other text or information.
 
 user:
 The "I don't know"-ness metric is a measure of how much an answer conveys the lack of knowledge or uncertainty, which is useful for making sure a chatbot for a particular domain doesn't answer outside that domain. Score the I-dont-know-ness of the answer between one to five stars using the following rating scale:
