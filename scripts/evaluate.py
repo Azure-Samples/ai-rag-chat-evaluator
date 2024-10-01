@@ -114,16 +114,12 @@ def run_evaluation(
         return False
 
     logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
-    try:
-        gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
-            model=openai_config.model,
-            messages=[{"role": "user", "content": "Hello!"}],
-            n=1,
-        )
-        logger.info('Successfully received response from GPT: "%s"', gpt_response.choices[0].message.content)
-    except Exception as e:
-        logger.error("Failed to send a test chat completion to the GPT deployment due to error: \n%s", e)
-        return False
+    gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
+        model=openai_config["model"],
+        messages=[{"role": "user", "content": "Hello!"}],
+        n=1,
+    )
+    logger.info('Successfully received response from GPT: "%s"', gpt_response.choices[0].message.content)
 
     logger.info("Starting evaluation...")
     for metric in requested_metrics:
@@ -149,8 +145,8 @@ def run_evaluation(
         output.update(target_response)
         for metric in requested_metrics:
             result = metric.evaluator_fn(openai_config=openai_config)(
-                question=row["question"],
-                answer=output["answer"],
+                query=row["question"],
+                response=output["answer"],
                 context=output["context"],
                 ground_truth=row["truth"],
             )
@@ -183,7 +179,7 @@ def run_evaluation(
 
     with open(results_dir / "evaluate_parameters.json", "w", encoding="utf-8") as parameters_file:
         parameters = {
-            "evaluation_gpt_model": openai_config.model,
+            "evaluation_gpt_model": openai_config["model"],
             "evaluation_timestamp": int(time.time()),
             "testdata_path": str(testdata_path),
             "target_url": target_url,

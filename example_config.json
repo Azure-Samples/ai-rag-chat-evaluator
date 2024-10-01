@@ -1,15 +1,15 @@
 {
-    "testdata_path": "example_input/qa.jsonl",
-    "results_dir": "example_results/experiment<TIMESTAMP>",
-    "requested_metrics": ["gpt_groundedness", "gpt_relevance", "gpt_coherence", "answer_length", "latency"],
+    "testdata_path": "pamelas_blog_input/qa.jsonl",
+    "results_dir": "pamelas_blog_results/test_new_sdk",
+    "requested_metrics": ["mygroundedness", "myrelevance", "answer_length", "latency", "has_citation", "citation_match"],
     "target_url": "http://localhost:50505/chat",
     "target_parameters": {
         "overrides": {
             "top": 3,
             "temperature": 0.3,
+            "retrieval_mode": "hybrid",
             "minimum_reranker_score": 0,
             "minimum_search_score": 0,
-            "retrieval_mode": "hybrid",
             "semantic_ranker": true,
             "semantic_captions": false,
             "suggest_followup_questions": false,
@@ -19,7 +19,8 @@
                 "embedding"
             ],
             "use_gpt4v": false,
-            "gpt4v_input": "textAndImages"
+            "gpt4v_input": "textAndImages",
+            "seed": 1
         }
     },
     "target_response_answer_jmespath": "message.content",

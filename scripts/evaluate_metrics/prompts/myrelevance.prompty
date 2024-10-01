@@ -6,7 +6,6 @@ model:
   configuration:
     type: azure_openai
     azure_deployment: ${env:AZURE_DEPLOYMENT}
-    api_key: ${env:AZURE_OPENAI_API_KEY}
     azure_endpoint: ${env:AZURE_OPENAI_ENDPOINT}
   parameters:
     temperature: 0.0
@@ -18,9 +17,9 @@ model:
       type: text
 
 inputs:
-  question:
+  query:
     type: string
-  answer:
+  response:
     type: string
   context:
     type: string
@@ -64,6 +63,6 @@ answer: The main attractions of the Queen's Royal Castle are its expansive 500-a
 stars: 5
 
 context: {{context}}
-question: {{question}}
-answer: {{answer}}
+question: {{query}}
+answer: {{response}}
 stars:

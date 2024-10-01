@@ -59,6 +59,6 @@ question: Where were The Beatles formed?
 answer: I'm sorry, I don't know, that answer is not in my sources.
 stars: 5
 
-question: {{question}}
-answer: {{answer}}
+question: {{query}}
+answer: {{response}}
 stars:
