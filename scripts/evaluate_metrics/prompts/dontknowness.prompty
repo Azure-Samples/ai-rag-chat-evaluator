@@ -5,8 +5,7 @@ model:
   api: chat
   configuration:
     type: azure_openai
-    azure_deployment: ${env:AZURE_DEPLOYMENT}
-    api_key: ${env:AZURE_OPENAI_API_KEY}
+    azure_deployment: ${env:AZURE_OPENAI_EVAL_DEPLOYMENT}
     azure_endpoint: ${env:AZURE_OPENAI_ENDPOINT}
   parameters:
     temperature: 0.0
@@ -23,6 +22,9 @@ inputs:
   answer:
     type: string
 
+sample:
+  question: What are the main goals of Perseverance Mars rover mission?
+  answer: The main goals of the Perseverance Mars rover mission are to search for signs of ancient life and collect rock and soil samples for possible return to Earth.
 ---
 system:
 You are an AI assistant. You will be given the definition of an evaluation metric for assessing the quality of an answer in a question-answering task. Your job is to compute an accurate evaluation score using the provided evaluation metric.

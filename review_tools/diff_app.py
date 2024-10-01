@@ -27,6 +27,17 @@ class DiffApp(App):
         if self.changed:
             # filter out questions that have the same value for the given column
             for question in list(self.data_dicts[0].keys()):
+                # if question isn't in the second directory, skip
+                if question not in self.data_dicts[1]:
+                    self.data_dicts[0].pop(question)
+                    continue
+                # if either metric is None, skip
+                if (
+                    self.data_dicts[0][question].get(self.changed) is None
+                    or self.data_dicts[1][question].get(self.changed) is None
+                ):
+                    self.data_dicts[0].pop(question)
+                    continue
                 if self.data_dicts[0][question].get(self.changed) == self.data_dicts[1][question].get(self.changed):
                     if math.isclose(
                         self.data_dicts[0][question].get(self.changed), self.data_dicts[1][question].get(self.changed)
