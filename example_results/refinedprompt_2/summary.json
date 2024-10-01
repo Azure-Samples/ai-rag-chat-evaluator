@@ -25,7 +25,7 @@
         "max": 3114,
         "min": 92
     },
-    "answer_has_citation": {
+    "has_citation": {
         "total": 198,
         "rate": 0.99
     }
