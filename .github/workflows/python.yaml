@@ -3,8 +3,20 @@ name: Python checks
 on:
   push:
     branches: [ main ]
+    paths-ignore:
+      - "**.md"
+      - ".devcontainer/**"
+      - ".github/**"
+      - "example_results/**"
+      - "example_input/**"
   pull_request:
     branches: [ main ]
+    paths-ignore:
+      - "**.md"
+      - ".devcontainer/**"
+      - ".github/**"
+      - "example_results/**"
+      - "example_input/**"
   workflow_call:
 
 jobs:

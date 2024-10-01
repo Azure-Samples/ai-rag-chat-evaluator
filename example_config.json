@@ -19,7 +19,8 @@
                 "embedding"
             ],
             "use_gpt4v": false,
-            "gpt4v_input": "textAndImages"
+            "gpt4v_input": "textAndImages",
+            "seed": 1
         }
     },
     "target_response_answer_jmespath": "message.content",
