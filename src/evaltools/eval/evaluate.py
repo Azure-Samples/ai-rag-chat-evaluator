@@ -49,9 +49,11 @@ def send_question_to_target(
                 context = json.dumps(data_points, ensure_ascii=False)
             elif isinstance(data_points, list):
                 context = "\n\n".join(data_points)
-            else:
+            elif data_points is not None:
                 # Hopefully it's a string
                 context = data_points
+            else:
+                raise ValueError("Context is missing")
         except Exception:
             raise ValueError(
                 "Response does not adhere to the expected schema. "
