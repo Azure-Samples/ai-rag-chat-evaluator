@@ -1,0 +1,27 @@
+{
+    "evaluation_gpt_model": "gpt-4",
+    "evaluation_timestamp": 1724277997,
+    "testdata_path": "/Users/pamelafox/ai-rag-chat-evaluator/example_input/qa.jsonl",
+    "target_url": "http://localhost:50505/chat",
+    "target_parameters": {
+        "overrides": {
+            "top": 3,
+            "temperature": 0.3,
+            "minimum_reranker_score": 0,
+            "minimum_search_score": 0,
+            "retrieval_mode": "hybrid",
+            "semantic_ranker": true,
+            "semantic_captions": false,
+            "suggest_followup_questions": false,
+            "use_oid_security_filter": false,
+            "use_groups_security_filter": false,
+            "vector_fields": [
+                "embedding"
+            ],
+            "use_gpt4v": false,
+            "gpt4v_input": "textAndImages",
+            "prompt_template": "Assistant helps the company employees with their healthcare plan questions, and questions about the employee handbook. Be brief in your answers.\nAnswer ONLY with the facts listed in the list of sources below. If there isn't enough information below, say you don't know. Do not generate answers that don't use the sources below. If asking a clarifying question to the user would help, ask the question.\nIf the question is not in English, answer in the language used in the question.\nEach source has a name followed by colon and the actual information, always include the source name for each fact you use in the response. Use square brackets to reference the source, for example [info1.txt]. Don't combine sources, list each source separately, for example [info1.txt][info2.pdf]."
+        }
+    },
+    "num_questions": null
+}

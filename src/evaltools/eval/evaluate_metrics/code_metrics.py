@@ -62,8 +62,8 @@ class CitationMatchMetric(BaseMetric):
                 logger.warning("Received answer of None, can't compute citation_match metric. Setting to -1.")
                 return {cls.METRIC_NAME: -1}
             # Return true if all citations in the truth are present in the answer
-            truth_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}\]", ground_truth))
-            answer_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}\]", answer))
+            truth_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}(#page=\d+)*\]", ground_truth))
+            answer_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}(#page=\d+)*\]", answer))
             citation_match = truth_citations.issubset(answer_citations)
             return {cls.METRIC_NAME: citation_match}
 
