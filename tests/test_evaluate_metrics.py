@@ -1,6 +1,6 @@
 import pandas as pd
 
-from scripts.evaluate_metrics import builtin_metrics, code_metrics, prompt_metrics
+from evaltools.eval.evaluate_metrics import builtin_metrics, code_metrics, prompt_metrics
 
 
 def test_answer_length():

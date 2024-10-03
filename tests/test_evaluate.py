@@ -2,7 +2,7 @@ from datetime import timedelta
 
 import requests
 
-from scripts.evaluate import send_question_to_target
+from evaltools.eval.evaluate import send_question_to_target
 
 
 def test_send_question_to_target_valid():
