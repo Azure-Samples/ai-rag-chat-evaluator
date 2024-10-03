@@ -7,7 +7,7 @@ def test_answer_length():
     metric = code_metrics.AnswerLengthMetric()
     metric_function = metric.evaluator_fn()
     assert callable(metric_function)
-    assert metric_function(answer="Hello, world!") == {"answer_length": 13}
+    assert metric_function(response="Hello, world!") == {"answer_length": 13}
     df = pd.DataFrame([{"answer_length": 20}, {"answer_length": 10}, {"answer_length": 5}])
     assert metric.get_aggregate_stats(df) == {"mean": 11.67, "max": 20, "min": 5}
 
@@ -15,7 +15,7 @@ def test_answer_length():
 def test_answer_length_new():
     metric = code_metrics.AnswerLengthMetric()
     metric_function = metric.evaluator_fn()
-    assert metric_function(answer=None) == {"answer_length": -1}
+    assert metric_function(response=None) == {"answer_length": -1}
     df = pd.DataFrame([{"answer_length": 20}, {"answer_length": 10}, {"answer_length": 5}, {"answer_length": -1}])
     assert metric.get_aggregate_stats(df) == {"mean": 11.67, "max": 20, "min": 5}
 
@@ -24,8 +24,8 @@ def test_has_citation():
     metric = code_metrics.HasCitationMetric()
     metric_function = metric.evaluator_fn()
     assert callable(metric_function)
-    assert metric_function(answer="Hello, world!") == {"has_citation": False}
-    assert metric_function(answer="Hello, [world.pdf]!") == {"has_citation": True}
+    assert metric_function(response="Hello, world!") == {"has_citation": False}
+    assert metric_function(response="Hello, [world.pdf]!") == {"has_citation": True}
 
     df = pd.DataFrame([{"has_citation": True}, {"has_citation": False}, {"has_citation": True}])
     assert metric.get_aggregate_stats(df) == {"total": 2, "rate": 0.67}
@@ -34,7 +34,7 @@ def test_has_citation():
 def test_has_citation_none():
     metric = code_metrics.HasCitationMetric()
     metric_function = metric.evaluator_fn()
-    assert metric_function(answer=None) == {"has_citation": -1}
+    assert metric_function(response=None) == {"has_citation": -1}
     df = pd.DataFrame([{"has_citation": True}, {"has_citation": False}, {"has_citation": -1}])
     assert metric.get_aggregate_stats(df) == {"total": 1, "rate": 0.5}
 
@@ -43,13 +43,13 @@ def test_citation_match():
     metric = code_metrics.CitationMatchMetric()
     metric_function = metric.evaluator_fn()
     assert callable(metric_function)
-    assert metric_function(ground_truth="answer in [file.pdf]", answer="answer in [file2.pdf]") == {
+    assert metric_function(ground_truth="answer in [file.pdf]", response="answer in [file2.pdf]") == {
         "citation_match": False
     }
-    assert metric_function(ground_truth="answer in [file2.pdf]", answer="answer in [file2.pdf]") == {
+    assert metric_function(ground_truth="answer in [file2.pdf]", response="answer in [file2.pdf]") == {
         "citation_match": True
     }
-    assert metric_function(ground_truth="answer in [file2.pdf]", answer="answer in [file1.pdf][file2.pdf]") == {
+    assert metric_function(ground_truth="answer in [file2.pdf]", response="answer in [file1.pdf][file2.pdf]") == {
         "citation_match": True
     }
     df = pd.DataFrame([{"citation_match": True}, {"citation_match": False}, {"citation_match": True}])
@@ -58,16 +58,16 @@ def test_citation_match():
 
 def test_citation_match_filenames_only():
     truth = 'Use settings like "python.linting.enabled": true, "[python]" [best-practices-for-prompting-github.html]'
-    answer = 'Use extension with setting "python.linting.enabled" [best-practices-for-prompting-github.html]'
+    response = 'Use extension with setting "python.linting.enabled" [best-practices-for-prompting-github.html]'
     metric = code_metrics.CitationMatchMetric()
     metric_function = metric.evaluator_fn()
-    assert metric_function(ground_truth=truth, answer=answer) == {"citation_match": True}
+    assert metric_function(ground_truth=truth, response=response) == {"citation_match": True}
 
 
 def test_citation_match_none():
     metric = code_metrics.CitationMatchMetric()
     metric_function = metric.evaluator_fn()
-    assert metric_function(ground_truth="Answer", answer=None) == {"citation_match": -1}
+    assert metric_function(ground_truth="Answer", response=None) == {"citation_match": -1}
     df = pd.DataFrame([{"citation_match": True}, {"citation_match": False}, {"citation_match": -1}])
     assert metric.get_aggregate_stats(df) == {"total": 1, "rate": 0.5}
 

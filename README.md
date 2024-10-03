@@ -79,7 +79,7 @@ If you already have an Azure OpenAI instance, you can use that instead of creati
 
     ```shell
     AZURE_OPENAI_EVAL_DEPLOYMENT="<deployment-name>"
-    AZURE_OPENAI_SERVICE="<service-name>"
+    AZURE_OPENAI_ENDPOINT="https://<service-name>.openai.azure.com"
     ```
 
 3. The scripts default to keyless access (via `AzureDefaultCredential`), but you can optionally use a key by setting `AZURE_OPENAI_KEY` in `.env`.
@@ -128,7 +128,7 @@ This repo includes a script for generating questions and answers from documents 
 2. Fill in the values for your Azure AI Search instance:
 
     ```shell
-    AZURE_SEARCH_SERVICE="<service-name>"
+    AZURE_SEARCH_ENDPOINT="https://<service-name>.search.windows.net"
     AZURE_SEARCH_INDEX="<index-name>"
     AZURE_SEARCH_KEY=""
     ```

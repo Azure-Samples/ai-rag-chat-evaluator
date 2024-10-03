@@ -1,4 +1,4 @@
-from promptflow.evals.evaluators import (
+from azure.ai.evaluation import (
     CoherenceEvaluator,
     F1ScoreEvaluator,
     FluencyEvaluator,

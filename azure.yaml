@@ -6,7 +6,7 @@ metadata:
 pipeline:
   variables:
     - OPENAI_HOST
-    - AZURE_OPENAI_SERVICE
+    - AZURE_OPENAI_ENDPOINT
     - AZURE_OPENAI_RESOURCE_GROUP
     - OPENAI_ORGANIZATION
   secrets:

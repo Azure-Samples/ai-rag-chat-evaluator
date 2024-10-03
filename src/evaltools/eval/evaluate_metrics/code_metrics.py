@@ -11,11 +11,11 @@ class AnswerLengthMetric(BaseMetric):
 
     @classmethod
     def evaluator_fn(cls, **kwargs):
-        def answer_length(*, answer, **kwargs):
-            if answer is None:
-                logger.warning("Received answer of None, can't compute answer_length metric. Setting to -1.")
+        def answer_length(*, response, **kwargs):
+            if response is None:
+                logger.warning("Received response of None, can't compute answer_length metric. Setting to -1.")
                 return {cls.METRIC_NAME: -1}
-            return {cls.METRIC_NAME: len(answer)}
+            return {cls.METRIC_NAME: len(response)}
 
         return answer_length
 
@@ -35,11 +35,11 @@ class HasCitationMetric(BaseMetric):
 
     @classmethod
     def evaluator_fn(cls, **kwargs):
-        def has_citation(*, answer, **kwargs):
-            if answer is None:
-                logger.warning("Received answer of None, can't compute has_citation metric. Setting to -1.")
+        def has_citation(*, response, **kwargs):
+            if response is None:
+                logger.warning("Received response of None, can't compute has_citation metric. Setting to -1.")
                 return {cls.METRIC_NAME: -1}
-            return {cls.METRIC_NAME: bool(re.search(r"\[[^\]]+\]", answer))}
+            return {cls.METRIC_NAME: bool(re.search(r"\[[^\]]+\]", response))}
 
         return has_citation
 
@@ -57,14 +57,14 @@ class CitationMatchMetric(BaseMetric):
 
     @classmethod
     def evaluator_fn(cls, **kwargs):
-        def citation_match(*, answer, ground_truth, **kwargs):
-            if answer is None:
-                logger.warning("Received answer of None, can't compute citation_match metric. Setting to -1.")
+        def citation_match(*, response, ground_truth, **kwargs):
+            if response is None:
+                logger.warning("Received response of None, can't compute citation_match metric. Setting to -1.")
                 return {cls.METRIC_NAME: -1}
-            # Return true if all citations in the truth are present in the answer
+            # Return true if all citations in the truth are present in the response
             truth_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}(#page=\d+)*\]", ground_truth))
-            answer_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}(#page=\d+)*\]", answer))
-            citation_match = truth_citations.issubset(answer_citations)
+            response_citations = set(re.findall(r"\[([^\]]+)\.\w{3,4}(#page=\d+)*\]", response))
+            citation_match = truth_citations.issubset(response_citations)
             return {cls.METRIC_NAME: citation_match}
 
         return citation_match

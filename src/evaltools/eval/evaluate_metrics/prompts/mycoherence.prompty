@@ -6,7 +6,6 @@ model:
   configuration:
     type: azure_openai
     azure_deployment: ${env:AZURE_DEPLOYMENT}
-    api_key: ${env:AZURE_OPENAI_API_KEY}
     azure_endpoint: ${env:AZURE_OPENAI_ENDPOINT}
   parameters:
     temperature: 0.0
@@ -18,11 +17,14 @@ model:
       type: text
 
 inputs:
-  question:
+  query:
     type: string
-  answer:
+  response:
     type: string
 
+sample:
+  query: What are the main goals of Perseverance Mars rover mission?
+  response: The main goals of the Perseverance Mars rover mission are to search for signs of ancient life and collect rock and soil samples for possible return to Earth.
 ---
 system:
 You are an AI assistant. You will be given the definition of an evaluation metric for assessing the quality of an answer in a question-answering task. Your job is to compute an accurate evaluation score using the provided evaluation metric. You should return a single integer value between 1 to 5 representing the evaluation metric. You will include no other text or information.
@@ -57,6 +59,6 @@ question: What can you tell me about climate change and its effects on the envir
 answer: Climate change has far-reaching effects on the environment. Rising temperatures result in the melting of polar ice caps, contributing to sea-level rise. Additionally, more frequent and severe weather events, such as hurricanes and heatwaves, can cause disruption to ecosystems and human societies alike.
 stars: 5
 
-question: {{question}}
-answer: {{answer}}
+question: {{query}}
+answer: {{response}}
 stars:
