@@ -10,7 +10,7 @@ from azure.search.documents import SearchClient
 
 from evaltools import service_setup
 
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 
 
 def generate_test_qa_data(

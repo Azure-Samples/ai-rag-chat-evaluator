@@ -12,7 +12,7 @@ from evaltools import service_setup
 
 from .evaluate_metrics import metrics_by_name
 
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 
 
 def send_question_to_target(

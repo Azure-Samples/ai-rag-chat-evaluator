@@ -9,7 +9,7 @@ from .base_metric import BaseMetric
 
 PROMPT_TEMPLATE_DIR = Path(__file__).resolve().parent / "prompts"
 
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 
 
 class PromptBasedEvaluator:

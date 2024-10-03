@@ -15,7 +15,7 @@ app = typer.Typer(pretty_exceptions_enable=False)
 logging.basicConfig(
     level=logging.WARNING, format="%(message)s", datefmt="[%X]", handlers=[RichHandler(rich_tracebacks=True)]
 )
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 # We only set the level to INFO for our logger,
 # to avoid seeing the noisy INFO level logs from the Azure SDKs
 logger.setLevel(logging.INFO)

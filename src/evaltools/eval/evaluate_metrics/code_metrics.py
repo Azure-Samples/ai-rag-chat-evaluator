@@ -3,7 +3,7 @@ import re
 
 from .base_metric import BaseMetric
 
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 
 
 class AnswerLengthMetric(BaseMetric):
