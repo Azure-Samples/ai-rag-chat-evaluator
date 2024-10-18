@@ -8,7 +8,7 @@ from rich.logging import RichHandler
 from evaltools import service_setup
 from evaltools.eval.evaluate import run_evaluate_from_config
 from evaltools.gen.generate import generate_dontknows_qa_data, generate_test_qa_data_for_search_index
-from evaltools.review import diff_app, summary_app
+from evaltools.review import diff_app, summary_app, summary_markdown
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -95,8 +95,17 @@ def diff(
 
 
 @app.command()
-def summary(results_dir: Path = typer.Argument(exists=True, dir_okay=True, file_okay=False)):
-    summary_app.main(results_dir)
+def summary(
+    results_dir: Path = typer.Argument(exists=True, dir_okay=True, file_okay=False),
+    output: str | None = typer.Option(help="Output type, can be 'app' or 'markdown'", default=None, parser=str_or_none),
+    highlight: str | None = typer.Option(
+        help="Highlight a specific run in the summary", default=None, parser=str_or_none
+    ),
+):
+    if output == "markdown":
+        print(summary_markdown.main(results_dir, highlight_run=highlight))
+    else:
+        summary_app.main(results_dir)
 
 
 def cli():
