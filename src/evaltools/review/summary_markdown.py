@@ -21,16 +21,16 @@ def main(results_dir: Path, highlight_run: str | None = None) -> str:
     if highlight_run:
         headers = [f"☞{header}☜" if ind == highlight_run_index else header for ind, header in enumerate(headers)]
 
-    table = " | ".join(headers) + " |\n"
+    table = "| " + " | ".join(headers) + " |\n"
     table += "|" + " |".join(["---"] * len(rows[0])) + " |\n"
     for ind, row in enumerate(rows[1:]):
-        # for every other row, replace the first column with previous metric name
+        # for every other row, replace the first column with whitespace
         if ind % 2 == 1:
-            row[0] = rows[ind - 1][0]
+            row[0] = "↑"
         # stringifying the row
         row = [str(cell) for cell in row]
         # highlight the cell that corresponds to the highlight run
         if highlight_run:
             row = [f"**{cell}**" if ind == highlight_run_index else cell for ind, cell in enumerate(row)]
-        table += " | ".join(row) + " |\n"
+        table += "| " + " | ".join(row) + " |\n"
     return table
