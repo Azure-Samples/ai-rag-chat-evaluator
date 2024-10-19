@@ -23,7 +23,6 @@ def main(results_dir: Path, highlight_run: str | None = None) -> str:
 
     table = "| " + " | ".join(headers) + " |\n"
     table += "|" + " |".join(["---"] * len(rows[0])) + " |\n"
-    print(rows)
     for ind, row in enumerate(rows[1:]):
         if row[0] == "":
             row[0] = "↑"
