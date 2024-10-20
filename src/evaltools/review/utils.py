@@ -49,6 +49,9 @@ def summarize_results(results_dir):
         # The second row of columns should just have the stat names
         for stat in shared_metric_stats[metric_name]:
             second_row.append(stat)
+    # add num questions
+    first_row.append("num_questions")
+    second_row.append("total")
 
     rows = [first_row, second_row]
     row_parameters = {}
@@ -61,6 +64,8 @@ def summarize_results(results_dir):
                     run_row.append(summary[metric_name][stat])
                 else:
                     run_row.append("?")
+        with open(Path(results_dir) / folder / "eval_results.jsonl") as f:
+            run_row.append(sum(1 for _ in f))
         rows.append(run_row)
         with open(Path(results_dir) / folder / "evaluate_parameters.json") as f:
             row_parameters[folder] = json.load(f)
