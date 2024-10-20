@@ -218,14 +218,17 @@ def process_config(obj: dict):
                     obj[key] = f.read()
 
 
-def run_evaluate_from_config(working_dir, config_path, num_questions, target_url=None, openai_config=None):
+def run_evaluate_from_config(
+    working_dir, config_path, num_questions, target_url=None, results_dir=None, openai_config=None
+):
     config_path = working_dir / Path(config_path)
     logger.info("Running evaluation from config %s", config_path)
     with open(config_path, encoding="utf-8") as f:
         config = json.load(f)
         process_config(config)
 
-    results_dir = working_dir / Path(config["results_dir"])
+    if results_dir is None:
+        results_dir = working_dir / Path(config["results_dir"])
 
     evaluation_run_complete = run_evaluation(
         openai_config=openai_config or service_setup.get_openai_config(),

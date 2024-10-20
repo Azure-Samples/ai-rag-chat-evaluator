@@ -31,6 +31,10 @@ def str_or_none(raw: str) -> str | None:
     return None if raw == "None" else raw
 
 
+def path_or_none(raw: str) -> Path | None:
+    return None if raw == "None" else Path(raw)
+
+
 @app.command()
 def generate(
     output: Path = typer.Option(exists=False, dir_okay=False, file_okay=True),
@@ -75,8 +79,11 @@ def evaluate(
         default=None,
         parser=str_or_none,
     ),
+    resultsdir: Path = typer.Option(
+        help="Directory to save the results of the evaluation", default=None, parser=path_or_none
+    ),
 ):
-    run_evaluate_from_config(Path.cwd(), config, numquestions, targeturl)
+    run_evaluate_from_config(Path.cwd(), config, numquestions, targeturl, resultsdir)
 
 
 def str_or_none(value: str) -> str | None:
