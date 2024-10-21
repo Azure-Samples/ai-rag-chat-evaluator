@@ -1,7 +1,7 @@
 requests
 python-dotenv
 azure-ai-generative[evaluate]==1.0.0b8
-azure-ai-evaluation==1.0.0b3
+azure-ai-evaluation==1.0.0b4
 azure-search-documents
 typer
 openai>=1.0.0
