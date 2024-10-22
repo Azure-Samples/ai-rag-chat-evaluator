@@ -219,7 +219,7 @@ def process_config(obj: dict):
 
 
 def run_evaluate_from_config(
-    working_dir, config_path, num_questions, target_url=None, results_dir=None, openai_config=None
+    working_dir, config_path, num_questions=None, target_url=None, results_dir=None, openai_config=None
 ):
     config_path = working_dir / Path(config_path)
     logger.info("Running evaluation from config %s", config_path)

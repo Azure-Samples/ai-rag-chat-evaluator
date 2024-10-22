@@ -8,7 +8,7 @@ from rich.logging import RichHandler
 from evaltools import service_setup
 from evaltools.eval.evaluate import run_evaluate_from_config
 from evaltools.gen.generate import generate_dontknows_qa_data, generate_test_qa_data_for_search_index
-from evaltools.review import diff_app, summary_app, summary_markdown
+from evaltools.review import diff_app, diff_markdown, summary_app, summary_markdown
 
 app = typer.Typer(pretty_exceptions_enable=False)
 
@@ -97,8 +97,13 @@ def diff(
     changed: str | None = typer.Option(
         help="Show only questions whose values changed for the given column", default=None, parser=str_or_none
     ),
+    output: str | None = typer.Option(help="Output type, can be 'app' or 'markdown'", default=None, parser=str_or_none),
 ):
-    diff_app.main(directory1, directory2, changed)
+    directories = [directory1] if directory2 is None else [directory1, directory2]
+    if output == "markdown":
+        print(diff_markdown.main(directories, changed))
+    else:
+        diff_app.main(directories, changed)
 
 
 @app.command()

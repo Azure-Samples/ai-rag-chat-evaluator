@@ -1,4 +1,5 @@
 import json
+import math
 import os
 from pathlib import Path
 
@@ -71,3 +72,27 @@ def summarize_results(results_dir):
             row_parameters[folder] = json.load(f)
 
     return rows, row_parameters
+
+
+def diff_directories(directories: list[Path], changed: str | None = None):
+    data_dicts = []
+    for directory in directories:
+        with open(directory / "eval_results.jsonl") as f:
+            data_json = [json.loads(question_json) for question_json in f.readlines()]
+            data_dicts.append({question["question"]: question for question in data_json})
+    if changed:
+        # filter out questions that have the same value for the given column
+        for question in list(data_dicts[0].keys()):
+            # if question isn't in the second directory, skip
+            if question not in data_dicts[1]:
+                data_dicts[0].pop(question)
+                continue
+            # if either metric is None, skip
+            if data_dicts[0][question].get(changed) is None or data_dicts[1][question].get(changed) is None:
+                data_dicts[0].pop(question)
+                continue
+            if data_dicts[0][question].get(changed) == data_dicts[1][question].get(changed):
+                if math.isclose(data_dicts[0][question].get(changed), data_dicts[1][question].get(changed)):
+                    data_dicts[0].pop(question)
+                    data_dicts[1].pop(question)
+    return data_dicts
