@@ -1,49 +1,26 @@
 # a CLI tool to diff two JSON files
-import json
-import math
 from pathlib import Path
 
 from textual.app import App, ComposeResult
 from textual.containers import Horizontal, Vertical, VerticalScroll
 from textual.widgets import Button, DataTable, Markdown, Static
 
+from .utils import diff_directories
+
 
 class DiffApp(App):
     CSS_PATH = "diff_app.tcss"
 
-    def __init__(self, directory1: Path, directory2: Path = None, changed: str = None):
+    def __init__(self, directories: list[Path], changed: str = None):
         super().__init__()
         # Only include the first directory if the second is not provided
-        self.directories = [directory1] if directory2 is None else [directory1, directory2]
+        self.directories = directories
         self.changed = changed
         self.data_dicts = []  # Store dicts keyed by question
         self.result_index = 0  # Based on results in the first directory
 
     def on_mount(self):
-        for directory in self.directories:
-            with open(directory / "eval_results.jsonl") as f:
-                data_json = [json.loads(question_json) for question_json in f.readlines()]
-                self.data_dicts.append({question["question"]: question for question in data_json})
-        if self.changed:
-            # filter out questions that have the same value for the given column
-            for question in list(self.data_dicts[0].keys()):
-                # if question isn't in the second directory, skip
-                if question not in self.data_dicts[1]:
-                    self.data_dicts[0].pop(question)
-                    continue
-                # if either metric is None, skip
-                if (
-                    self.data_dicts[0][question].get(self.changed) is None
-                    or self.data_dicts[1][question].get(self.changed) is None
-                ):
-                    self.data_dicts[0].pop(question)
-                    continue
-                if self.data_dicts[0][question].get(self.changed) == self.data_dicts[1][question].get(self.changed):
-                    if math.isclose(
-                        self.data_dicts[0][question].get(self.changed), self.data_dicts[1][question].get(self.changed)
-                    ):
-                        self.data_dicts[0].pop(question)
-                        self.data_dicts[1].pop(question)
+        self.data_dicts = diff_directories(self.directories)
         self.next_question()
 
     def on_button_pressed(self, event: Button.Pressed) -> None:
@@ -106,6 +83,6 @@ class DiffApp(App):
         self.result_index += 1
 
 
-def main(directory1: Path, directory2: Path, changed: str):
-    app = DiffApp(directory1, directory2, changed)
+def main(directories: list[Path], changed: str | None = None):
+    app = DiffApp(directories, changed)
     app.run()

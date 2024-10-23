@@ -19,5 +19,5 @@
     "hostRequirements": {
         "memory": "8gb"
     },
-    "postCreateCommand": "pip install -r requirements-dev.txt"
+    "postCreateCommand": "pip install -e .\"[dev]\""
 }

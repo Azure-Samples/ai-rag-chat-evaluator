@@ -2,57 +2,84 @@ import json
 import logging
 import math
 import random
+from collections.abc import Generator
 from pathlib import Path
 
 from azure.ai.generative.synthetic.qa import QADataGenerator, QAType
 from azure.search.documents import SearchClient
 
-from . import service_setup
+from evaltools import service_setup
 
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 
 
 def generate_test_qa_data(
     openai_config: dict,
-    search_client: SearchClient,
     num_questions_total: int,
     num_questions_per_source: int,
     output_file: Path,
-    citation_field_name: str,
+    source_retriever: Generator[dict, None, None],
+    source_to_text: callable,
+    answer_formatter: callable,
 ):
     logger.info(
         "Generating %d questions total, %d per source, based on search results",
         num_questions_total,
         num_questions_per_source,
     )
-
     qa_generator = QADataGenerator(model_config=openai_config)
 
-    r = search_client.search("", top=1000)
     qa: list[dict] = []
-    for doc in r:
+    for source in source_retriever():
         if len(qa) > num_questions_total:
+            logger.info("Generated enough questions already, stopping")
             break
-        logger.info("Processing search document %s", doc[citation_field_name])
-        text = doc["content"]
-
         result = qa_generator.generate(
-            text=text,
+            text=source_to_text(source),
             qa_type=QAType.LONG_ANSWER,
             num_questions=num_questions_per_source,
         )
 
         for question, answer in result["question_answers"]:
-            citation = f"[{doc[citation_field_name]}]"
-            qa.append({"question": question, "truth": answer + citation})
+            qa.append({"question": question, "truth": answer_formatter(answer, source)})
 
     logger.info("Writing %d questions to %s", len(qa), output_file)
     directory = Path(output_file).parent
     if not directory.exists():
         directory.mkdir(parents=True)
     with open(output_file, "w", encoding="utf-8") as f:
-        for item in qa:
+        for item in qa[0:num_questions_total]:
             f.write(json.dumps(item) + "\n")
+
+
+def generate_test_qa_data_for_search_index(
+    openai_config: dict,
+    num_questions_total: int,
+    num_questions_per_source: int,
+    output_file: Path,
+    search_client: SearchClient,
+    citation_field_name: str,
+):
+    def source_retriever() -> Generator[dict, None, None]:
+        for doc in search_client.search("", top=1000):
+            logger.info("Processing search document %s", doc[citation_field_name])
+            yield doc
+
+    def source_to_text(source) -> str:
+        return source["content"]
+
+    def answer_formatter(answer, source) -> str:
+        return f"{answer} [{source[citation_field_name]}]"
+
+    generate_test_qa_data(
+        openai_config,
+        num_questions_total,
+        num_questions_per_source,
+        output_file,
+        source_retriever,
+        source_to_text,
+        answer_formatter,
+    )
 
 
 def generate_based_on_questions(openai_client, model: str, qa: list, num_questions: int, prompt: str):
@@ -90,21 +117,21 @@ def generate_dontknows_qa_data(openai_config: dict, num_questions_total: int, in
     num_questions_each = math.ceil(num_questions_total / 4)
     dontknows_qa += generate_based_on_questions(
         openai_client,
-        openai_config["model"],
+        openai_config.model,
         qa,
         num_questions_each,
         f"Given these questions, suggest {num_questions_each} questions that are very related but are not directly answerable by the same sources. Do not simply ask for other examples of the same thing - your question should be standalone.",  # noqa: E501
     )
     dontknows_qa += generate_based_on_questions(
         openai_client,
-        openai_config["model"],
+        openai_config.model,
         qa,
         num_questions_each,
         f"Given these questions, suggest {num_questions_each} questions with similar keywords that are about publicly known facts.",  # noqa: E501
     )
     dontknows_qa += generate_based_on_questions(
         openai_client,
-        openai_config["model"],
+        openai_config.model,
         qa,
         num_questions_each,
         f"Given these questions, suggest {num_questions_each} questions that are not related to these topics at all but have well known answers.",  # noqa: E501
@@ -112,7 +139,7 @@ def generate_dontknows_qa_data(openai_config: dict, num_questions_total: int, in
     remaining = num_questions_total - len(dontknows_qa)
     dontknows_qa += generate_based_on_questions(
         openai_client,
-        openai_config["model"],
+        openai_config.model,
         qa=None,
         num_questions=remaining,
         prompt=f"Suggest {remaining} questions that are nonsensical, and would result in confusion if you asked it.",  # noqa: E501
