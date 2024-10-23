@@ -50,9 +50,6 @@ def summarize_results(results_dir):
         # The second row of columns should just have the stat names
         for stat in shared_metric_stats[metric_name]:
             second_row.append(stat)
-    # add num questions
-    first_row.append("num_questions")
-    second_row.append("total")
 
     rows = [first_row, second_row]
     row_parameters = {}

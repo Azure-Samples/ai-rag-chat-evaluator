@@ -181,6 +181,8 @@ def run_evaluation(
     summary = {}
     for metric in requested_metrics:
         summary[metric.METRIC_NAME] = metric.get_aggregate_stats(df)
+    # add a metric for the number of questions
+    summary["num_questions"] = {"total": len(df)}
 
     # summary statistics
     with open(results_dir / "summary.json", "w", encoding="utf-8") as summary_file:
