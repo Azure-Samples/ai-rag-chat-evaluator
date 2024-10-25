@@ -1,6 +1,7 @@
 [tool.ruff]
 line-length = 120
 target-version = "py39"
+lint.isort.known-first-party = ["evaltools"]
 lint.select = ["E", "F", "I", "UP"]
 lint.ignore = ["D203"]
 
@@ -10,3 +11,32 @@ target-version = ["py39"]
 
 [tool.pytest.ini_options]
 addopts = "-ra"
+
+[project]
+name = "evaltools"
+version = "0.1.1"
+description = "Evaluate chat applications using Azure OpenAI evaluators"
+dependencies = [
+    "requests",
+    "python-dotenv",
+    "azure-ai-generative[evaluate]==1.0.0b8",
+    "azure-ai-evaluation==1.0.0b3",
+    "azure-search-documents",
+    "typer",
+    "openai>=1.0.0",
+    "pandas",
+    "rich",
+    "jmespath",
+    "textual"
+]
+
+[project.optional-dependencies]
+dev = [
+    "pre-commit",
+    "ruff",
+    "black",
+    "pytest"
+]
+
+[tool.setuptools.package-data]
+evaltools = ["review/*.tcss"]

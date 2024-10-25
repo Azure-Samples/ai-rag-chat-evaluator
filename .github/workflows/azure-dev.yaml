@@ -92,12 +92,12 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install -e .[dev]
 
       - name: Run evaluation
         run: |
           azd env get-values > .env
           source .env
-          python -m scripts evaluate --config=example_config.json --numquestions=2 --targeturl=${{ env.TARGET_URL }}
+          python -m evaltools evaluate --config=example_config.json --numquestions=2 --targeturl=${{ env.TARGET_URL }}
         env:
           TARGET_URL: ${{ secrets.TARGET_URL }}

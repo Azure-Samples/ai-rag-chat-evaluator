@@ -8,12 +8,14 @@ from azure.core.credentials import AzureKeyCredential
 from azure.identity import AzureDeveloperCliCredential, get_bearer_token_provider
 from azure.search.documents import SearchClient
 
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 
 
 def get_azd_credential(tenant_id: Union[str, None]) -> AzureDeveloperCliCredential:
     if tenant_id:
+        logger.info("Using Azure Developer CLI Credential for tenant %s", tenant_id)
         return AzureDeveloperCliCredential(tenant_id=tenant_id, process_timeout=60)
+    logger.info("Using Azure Developer CLI Credential for home tenant")
     return AzureDeveloperCliCredential(process_timeout=60)
 
 
@@ -98,8 +100,14 @@ def get_search_client():
 def get_openai_client(oai_config: Union[AzureOpenAIModelConfiguration, OpenAIModelConfiguration]):
     if "azure_deployment" in oai_config:
         azure_token_provider = None
-        if not os.environ.get("AZURE_OPENAI_KEY"):
+        azure_credential = None
+        if "credential" in oai_config:
+            logger.info("Using Azure OpenAI Service with provided credential")
+            azure_credential = oai_config["credential"]
+        elif not os.environ.get("AZURE_OPENAI_KEY"):
+            logger.info("Using Azure OpenAI Service with Azure Developer CLI Credential")
             azure_credential = get_azd_credential(os.environ.get("AZURE_OPENAI_TENANT_ID"))
+        if azure_credential is not None:
             azure_token_provider = get_bearer_token_provider(
                 azure_credential, "https://cognitiveservices.azure.com/.default"
             )

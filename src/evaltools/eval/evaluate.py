@@ -8,10 +8,11 @@ import pandas as pd
 import requests
 from rich.progress import track
 
-from . import service_setup
+from evaltools import service_setup
+
 from .evaluate_metrics import metrics_by_name
 
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 
 
 def send_question_to_target(
@@ -44,7 +45,15 @@ def send_question_to_target(
         try:
             answer = jmespath.search(response_answer_jmespath, response_dict)
             data_points = jmespath.search(response_context_jmespath, response_dict)
-            context = "\n\n".join(data_points)
+            if isinstance(data_points, dict):
+                context = json.dumps(data_points, ensure_ascii=False)
+            elif isinstance(data_points, list):
+                context = "\n\n".join(data_points)
+            elif data_points is not None:
+                # Hopefully it's a string
+                context = data_points
+            else:
+                raise ValueError("Context is missing")
         except Exception:
             raise ValueError(
                 "Response does not adhere to the expected schema. "
@@ -172,6 +181,8 @@ def run_evaluation(
     summary = {}
     for metric in requested_metrics:
         summary[metric.METRIC_NAME] = metric.get_aggregate_stats(df)
+    # add a metric for the number of questions
+    summary["num_questions"] = {"total": len(df)}
 
     # summary statistics
     with open(results_dir / "summary.json", "w", encoding="utf-8") as summary_file:
@@ -209,17 +220,20 @@ def process_config(obj: dict):
                     obj[key] = f.read()
 
 
-def run_evaluate_from_config(working_dir, config_path, num_questions, target_url):
+def run_evaluate_from_config(
+    working_dir, config_path, num_questions=None, target_url=None, results_dir=None, openai_config=None
+):
     config_path = working_dir / Path(config_path)
     logger.info("Running evaluation from config %s", config_path)
     with open(config_path, encoding="utf-8") as f:
         config = json.load(f)
         process_config(config)
 
-    results_dir = working_dir / Path(config["results_dir"])
+    if results_dir is None:
+        results_dir = working_dir / Path(config["results_dir"])
 
     evaluation_run_complete = run_evaluation(
-        openai_config=service_setup.get_openai_config(),
+        openai_config=openai_config or service_setup.get_openai_config(),
         testdata_path=working_dir / config["testdata_path"],
         results_dir=results_dir,
         target_url=target_url or config["target_url"],
@@ -229,8 +243,8 @@ def run_evaluate_from_config(working_dir, config_path, num_questions, target_url
             "requested_metrics",
             ["gpt_groundedness", "gpt_relevance", "gpt_coherence", "answer_length", "latency"],
         ),
-        target_response_answer_jmespath=config.get("target_response_answer_jmespath"),
-        target_response_context_jmespath=config.get("target_response_context_jmespath"),
+        target_response_answer_jmespath=config.get("target_response_answer_jmespath", "message.content"),
+        target_response_context_jmespath=config.get("target_response_context_jmespath", "context.data_points.text"),
     )
 
     if evaluation_run_complete:

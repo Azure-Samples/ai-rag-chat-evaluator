@@ -3,11 +3,10 @@ import re
 
 from .base_metric import BaseMetric
 
-logger = logging.getLogger("scripts")
+logger = logging.getLogger("evaltools")
 
 
 class AnswerLengthMetric(BaseMetric):
-
     METRIC_NAME = "answer_length"
 
     @classmethod
@@ -32,7 +31,6 @@ class AnswerLengthMetric(BaseMetric):
 
 
 class HasCitationMetric(BaseMetric):
-
     METRIC_NAME = "has_citation"
 
     @classmethod
@@ -55,7 +53,6 @@ class HasCitationMetric(BaseMetric):
 
 
 class CitationMatchMetric(BaseMetric):
-
     METRIC_NAME = "citation_match"
 
     @classmethod
@@ -82,7 +79,6 @@ class CitationMatchMetric(BaseMetric):
 
 
 class LatencyMetric(BaseMetric):
-
     METRIC_NAME = "latency"
 
     @classmethod

@@ -11,14 +11,12 @@ from .base_metric import BaseMetric
 
 
 class BuiltinRatingMetric(BaseMetric):
-
     @classmethod
     def get_aggregate_stats(cls, df):
         return cls.get_aggregate_stats_for_numeric_rating(df, cls.METRIC_NAME)
 
 
 class BuiltinRelevanceMetric(BuiltinRatingMetric):
-
     METRIC_NAME = "gpt_relevance"
 
     @classmethod
@@ -27,7 +25,6 @@ class BuiltinRelevanceMetric(BuiltinRatingMetric):
 
 
 class BuiltinCoherenceMetric(BuiltinRatingMetric):
-
     METRIC_NAME = "gpt_coherence"
 
     @classmethod
@@ -36,7 +33,6 @@ class BuiltinCoherenceMetric(BuiltinRatingMetric):
 
 
 class BuiltinGroundednessMetric(BuiltinRatingMetric):
-
     METRIC_NAME = "gpt_groundedness"
 
     @classmethod
@@ -45,7 +41,6 @@ class BuiltinGroundednessMetric(BuiltinRatingMetric):
 
 
 class BuiltinSimilarityMetric(BuiltinRatingMetric):
-
     METRIC_NAME = "gpt_similarity"
 
     @classmethod
@@ -54,7 +49,6 @@ class BuiltinSimilarityMetric(BuiltinRatingMetric):
 
 
 class BuiltinFluencyMetric(BuiltinRatingMetric):
-
     METRIC_NAME = "gpt_fluency"
 
     @classmethod
@@ -63,7 +57,6 @@ class BuiltinFluencyMetric(BuiltinRatingMetric):
 
 
 class BuiltinF1ScoreMetric(BaseMetric):
-
     METRIC_NAME = "f1_score"
 
     @classmethod
