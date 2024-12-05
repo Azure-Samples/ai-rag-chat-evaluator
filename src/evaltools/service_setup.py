@@ -38,7 +38,6 @@ def get_openai_config() -> dict:
             }
             # azure-ai-evaluate will call DefaultAzureCredential behind the scenes,
             # so we must be logged in to Azure CLI with the correct tenant
-        openai_config["model"] = os.environ["OPENAI_GPT_MODEL"]
     else:
         logger.info("Using OpenAI Service with API Key from OPENAICOM_KEY")
         openai_config: OpenAIModelConfiguration = {
