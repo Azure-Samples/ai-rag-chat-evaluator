@@ -1,6 +1,13 @@
 from pathlib import Path
+from typing import Any
 
 from .utils import diff_directories
+
+
+def _round_metric(value: Any) -> Any:
+    if isinstance(value, float):
+        return round(value, 1)
+    return value
 
 
 def main(directories: list[Path], changed: str | None = None):
@@ -29,14 +36,14 @@ def main(directories: list[Path], changed: str | None = None):
             if isinstance(value, int | float):
                 metrics[column] = []
         for metric_name in metrics.keys():
+            first_value = _round_metric(data_dicts[0][question].get(metric_name))
             for ind, data_dict in enumerate(data_dicts):
-                value = data_dict[question].get(metric_name)
-                value_str = str(round(value, 1) if isinstance(value, float) else value)
+                value = _round_metric(data_dict[question].get(metric_name))
                 # Insert arrow emoji based on the difference between metric value and the first data_dict
                 value_emoji = ""
-                if value is not None and ind > 0 and value != data_dicts[0][question][metric_name]:
+                if value is not None and ind > 0 and value != first_value:
                     value_emoji = "⬆️" if value > data_dicts[0][question][metric_name] else "⬇️"
-                metrics[metric_name].append(f"{value_str} {value_emoji}")
+                metrics[metric_name].append(f"{value} {value_emoji}")
         # make a row for each metric
         for metric_name, metric_values in metrics.items():
             markdown_str += (

@@ -1,5 +1,6 @@
 import json
 import logging
+import os
 import time
 from pathlib import Path
 
@@ -94,6 +95,8 @@ def run_evaluation(
     num_questions=None,
     target_response_answer_jmespath=None,
     target_response_context_jmespath=None,
+    model=None,
+    azure_credential=None,
 ):
     logger.info("Running evaluation using data from %s", testdata_path)
     testdata = load_jsonl(testdata_path)
@@ -123,8 +126,8 @@ def run_evaluation(
         return False
 
     logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
-    gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
-        model=openai_config["model"],
+    gpt_response = service_setup.get_openai_client(openai_config, azure_credential).chat.completions.create(
+        model=model,
         messages=[{"role": "user", "content": "Hello!"}],
         n=1,
     )
@@ -190,7 +193,7 @@ def run_evaluation(
 
     with open(results_dir / "evaluate_parameters.json", "w", encoding="utf-8") as parameters_file:
         parameters = {
-            "evaluation_gpt_model": openai_config["model"],
+            "evaluation_gpt_model": model,
             "evaluation_timestamp": int(time.time()),
             "testdata_path": str(testdata_path),
             "target_url": target_url,
@@ -221,7 +224,14 @@ def process_config(obj: dict):
 
 
 def run_evaluate_from_config(
-    working_dir, config_path, num_questions=None, target_url=None, results_dir=None, openai_config=None
+    working_dir,
+    config_path,
+    num_questions=None,
+    target_url=None,
+    results_dir=None,
+    openai_config=None,
+    model=None,
+    azure_credential=None,
 ):
     config_path = working_dir / Path(config_path)
     logger.info("Running evaluation from config %s", config_path)
@@ -245,6 +255,8 @@ def run_evaluate_from_config(
         ),
         target_response_answer_jmespath=config.get("target_response_answer_jmespath", "message.content"),
         target_response_context_jmespath=config.get("target_response_context_jmespath", "context.data_points.text"),
+        model=model or os.environ["OPENAI_GPT_MODEL"],
+        azure_credential=azure_credential,
     )
 
     if evaluation_run_complete:
