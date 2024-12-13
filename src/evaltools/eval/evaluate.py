@@ -1,6 +1,7 @@
 import json
 import logging
 import time
+import os
 from pathlib import Path
 
 import jmespath
@@ -124,7 +125,7 @@ def run_evaluation(
 
     logger.info("Sending a test chat completion to the GPT deployment to ensure it is running...")
     gpt_response = service_setup.get_openai_client(openai_config).chat.completions.create(
-        model=openai_config["model"],
+        model=os.environ["OPENAI_GPT_MODEL"],
         messages=[{"role": "user", "content": "Hello!"}],
         n=1,
     )
@@ -190,7 +191,7 @@ def run_evaluation(
 
     with open(results_dir / "evaluate_parameters.json", "w", encoding="utf-8") as parameters_file:
         parameters = {
-            "evaluation_gpt_model": openai_config["model"],
+            "evaluation_gpt_model": os.environ["OPENAI_GPT_MODEL"],
             "evaluation_timestamp": int(time.time()),
             "testdata_path": str(testdata_path),
             "target_url": target_url,
