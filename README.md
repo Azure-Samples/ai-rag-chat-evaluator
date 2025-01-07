@@ -6,7 +6,7 @@ such as the system prompt, search parameters, and GPT model parameters.
 
 Whenever you are making changes to a RAG chat with the goal of improving the answers, you should evaluate the results.
 This repository offers tools to make it easier to run evaluations, plus examples of evaluations
-that we've run on our [sample chat app](https://github.com/Azure-Samples/azure-search-openai-demo/).
+that we've run on our [popular RAG chat solution](https://github.com/Azure-Samples/azure-search-openai-demo/).
 
 [📺 Watch a video overview of this repo](https://www.youtube.com/watch?v=mM8pZAI2C5w)
 
