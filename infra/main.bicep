@@ -105,6 +105,7 @@ output OPENAI_GPT_MODEL string = evalGptModelName
 output AZURE_OPENAI_SERVICE string = (openAiHost == 'azure') ? openAi.outputs.name : ''
 output AZURE_OPENAI_RESOURCE_GROUP string = (openAiHost == 'azure') ? openAiResourceGroup.name : ''
 output AZURE_OPENAI_EVAL_DEPLOYMENT string = (openAiHost == 'azure') ? evalGptDeploymentName : ''
+output AZURE_OPENAI_ENDPOINT string = (openAiHost == 'azure') ? openAi.outputs.endpoint : ''
 // Used only with non-Azure OpenAI deployments
 output OPENAI_KEY string = (openAiHost == 'openai') ? openAiApiKey : ''
 output OPENAI_ORGANIZATION string = (openAiHost == 'openai') ? openAiApiOrganization : ''
