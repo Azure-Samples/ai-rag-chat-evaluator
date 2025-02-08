@@ -5,7 +5,6 @@ import random
 from collections.abc import Generator
 from pathlib import Path
 
-from azure.ai.generative.synthetic.qa import QADataGenerator, QAType
 from azure.search.documents import SearchClient
 
 from evaltools import service_setup
@@ -22,6 +21,13 @@ def generate_test_qa_data(
     source_to_text: callable,
     answer_formatter: callable,
 ):
+    try:
+        from azure.ai.generative.synthetic.qa import QADataGenerator, QAType
+    except ImportError:
+        logger.error(
+            "Azure AI Generative package is deprecated and no longer working, so this functionality is disabled."
+        )
+
     logger.info(
         "Generating %d questions total, %d per source, based on search results",
         num_questions_total,
