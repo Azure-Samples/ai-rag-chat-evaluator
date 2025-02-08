@@ -105,8 +105,8 @@ We recommend at least 200 QA pairs if possible.
 There are a few ways to get this data:
 
 1. Manually curate a set of questions and answers that you consider to be ideal. This is the most accurate, but also the most time-consuming. Make sure your answers include citations in the expected format. This approach requires domain expertise in the data.
-2. Use the generator script to generate a set of questions and answers. This is the fastest, but may also be the least accurate. See below for details on how to run the generator script.
-3. Use the generator script to generate a set of questions and answers, and then manually curate them, rewriting any answers that are subpar and adding missing citations. This is a good middle ground, and is what we recommend.
+2. Use a generator script to generate a set of questions and answers, and use them directly. This is the fastest, but may also be the least accurate.
+3. Use a generator script to generate a set of questions and answers, and then manually curate them, rewriting any answers that are subpar and adding missing citations. This is a good middle ground, and is what we recommend.
 
 <details>
  <summary>Additional tips for ground truth data generation</summary>
@@ -116,43 +116,6 @@ There are a few ways to get this data:
 * Once your chat application is live, continually sample live user questions (within accordance to your privacy policy) to make sure you're representing the sorts of questions that users are asking.
 
 </details>
-
-### Running the generator script
-
-This repo includes a script for generating questions and answers from documents stored in Azure AI Search.
-
-> [!IMPORTANT]
-> The generator script can only generate English Q/A pairs right now, due to [limitations in the azure-ai-generative SDK](https://github.com/Azure/azure-sdk-for-python/issues/34099).
-
-1. Create `.env` file by copying `.env.sample`
-2. Fill in the values for your Azure AI Search instance:
-
-    ```shell
-    AZURE_SEARCH_ENDPOINT="https://<service-name>.search.windows.net"
-    AZURE_SEARCH_INDEX="<index-name>"
-    AZURE_SEARCH_KEY=""
-    ```
-
-    The key may not be necessary if it's configured for keyless access from your account.
-    If providing a key, it's best to provide a query key since the script only requires that level of access.
-
-3. Run the generator script:
-
-    ```shell
-    python -m evaltools generate --output=example_input/qa.jsonl --persource=5 --numquestions=200
-    ```
-
-    That script will generate 200 questions and answers, and store them in `example_input/qa.jsonl`. We've already provided an example based off the sample documents for this app.
-
-    To further customize the generator beyond the `numquestions` and `persource` parameters, modify `scripts/generate.py`.
-
-    Optional:
-
-    By default this script assumes your index citation field is named `sourcepage`, if your search index contains a different citation field name use the `citationfieldname` option to specify the correct name
-
-    ```shell
-    python -m evaltools generate --output=example_input/qa.jsonl --persource=5 --numquestions=200 --citationfieldname=filepath
-    ```
 
 ## Running an evaluation
 
