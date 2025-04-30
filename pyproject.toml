@@ -19,7 +19,6 @@ description = "Evaluate chat applications using Azure OpenAI evaluators"
 dependencies = [
     "requests",
     "python-dotenv",
-    "azure-ai-generative[evaluate]==1.0.0b11",
     "azure-ai-evaluation==1.5.0",
     "marshmallow==3.23.2", # Older version required due to promptflow issue with _T import
     "azure-search-documents",

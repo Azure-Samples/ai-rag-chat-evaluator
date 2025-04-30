@@ -12,7 +12,7 @@ def summarize_results(results_dir):
     folders = [f for f in os.listdir(results_dir) if os.path.isdir(os.path.join(results_dir, f))]
     folders.sort()
     for folder in folders:
-        with open(Path(results_dir) / folder / "summary.json") as f:
+        with open(Path(results_dir) / folder / "summary.json", encoding="utf-8") as f:
             summary = json.load(f)
             run_summaries[folder] = summary
             # first find the common parameters across the runs
@@ -62,10 +62,10 @@ def summarize_results(results_dir):
                     run_row.append(summary[metric_name][stat])
                 else:
                     run_row.append("?")
-        with open(Path(results_dir) / folder / "eval_results.jsonl") as f:
+        with open(Path(results_dir) / folder / "eval_results.jsonl", encoding="utf-8") as f:
             run_row.append(sum(1 for _ in f))
         rows.append(run_row)
-        with open(Path(results_dir) / folder / "evaluate_parameters.json") as f:
+        with open(Path(results_dir) / folder / "evaluate_parameters.json", encoding="utf-8") as f:
             row_parameters[folder] = json.load(f)
 
     return rows, row_parameters
@@ -74,7 +74,7 @@ def summarize_results(results_dir):
 def diff_directories(directories: list[Path], changed: str | None = None):
     data_dicts = []
     for directory in directories:
-        with open(directory / "eval_results.jsonl") as f:
+        with open(directory / "eval_results.jsonl", encoding="utf-8") as f:
             data_json = [json.loads(question_json) for question_json in f.readlines()]
             data_dicts.append({question["question"]: question for question in data_json})
     if changed:
