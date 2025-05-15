@@ -20,7 +20,7 @@ dependencies = [
     "requests",
     "python-dotenv",
     "azure-ai-evaluation==1.7.0",
-    "marshmallow==3.23.2", # Older version required due to promptflow issue with _T import
+    "marshmallow==4.0.0", # Older version required due to promptflow issue with _T import
     "azure-search-documents",
     "typer",
     "openai>=1.56.1", # Includes fix for httpx proxies issues
