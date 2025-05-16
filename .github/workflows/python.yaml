@@ -27,7 +27,7 @@ jobs:
       fail-fast: false
       matrix:
         # macos-13 is x84 and macos-14-large is arm64
-        os: ["ubuntu-20.04", "windows-latest", "macos-13", "macos-14-large"]
+        os: ["ubuntu-latest", "windows-latest", "macos-13", "macos-14-large"]
         python_version: ["3.9", "3.10", "3.11", "3.12"]
     steps:
         - uses: actions/checkout@v4
