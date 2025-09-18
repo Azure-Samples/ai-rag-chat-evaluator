@@ -28,8 +28,8 @@ param openAiApiKey string = ''
 param openAiApiOrganization string = ''
 
 param evalGptDeploymentName string = 'eval'
-param evalGptModelName string = 'gpt-4'
-param evalGptModelVersion string = '0613'
+param evalGptModelName string = 'gpt-4o'
+param evalGptModelVersion string = '2024-11-20'
 param evalGptDeploymentCapacity int = 30
 
 @description('Id of the user or app to assign application roles')
