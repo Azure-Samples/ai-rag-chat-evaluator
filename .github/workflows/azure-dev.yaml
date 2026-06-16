@@ -20,6 +20,7 @@ jobs:
   build:
     if: github.repository == 'Azure-samples/ai-rag-chat-evaluator'
     runs-on: ubuntu-latest
+    environment: production
     env:
       # azd required
       AZURE_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
