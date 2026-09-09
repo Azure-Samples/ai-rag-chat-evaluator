@@ -23,7 +23,7 @@ dependencies = [
     "marshmallow==3.23.2", # Older version required due to promptflow issue with _T import
     "azure-search-documents",
     "typer",
-    "openai>=1.56.1", # Includes fix for httpx proxies issues
+    "openai>=3.8.0", # Includes fix for httpx proxies issues
     "pandas",
     "rich",
     "jmespath",
