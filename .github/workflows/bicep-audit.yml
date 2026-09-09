@@ -19,7 +19,7 @@ jobs:
       security-events: write
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
 
       - name: Run Microsoft Security DevOps Analysis
         uses: microsoft/security-devops-action@preview
@@ -29,7 +29,7 @@ jobs:
           tools: templateanalyzer
 
       - name: Upload alerts to Security tab
-        uses: github/codeql-action/upload-sarif@v3
+        uses: github/codeql-action/upload-sarif@6f5948dfacef28e207b48d0905cf90c03365536d # v3.37.9
         if: github.repository_owner == 'Azure-Samples'
         with:
           sarif_file: ${{ steps.msdo.outputs.sarifFile }}
